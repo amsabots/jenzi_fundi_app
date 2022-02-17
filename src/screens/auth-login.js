@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, ToastAndroid, ScrollView} from 'react-native';
 
@@ -45,7 +46,7 @@ const Login = ({navigation}) => {
       .then(async res => {
         await AsyncStorage.setItem(offline_data.user, JSON.stringify(res.data));
         dispatch(user_data_actions.create_user(res.data));
-        ToastAndroid.show('Welcome to Jenzi', ToastAndroid.LONG);
+        ToastAndroid.show('Welcome to Jenzi smart', ToastAndroid.LONG);
       })
       .catch(err => {
         errorMessage(err);
@@ -67,9 +68,11 @@ const Login = ({navigation}) => {
             style={{
               ...FONTS.h4,
               color: COLORS.secondary,
-              marginBottom: SIZES.size_48,
             }}>
             Login
+          </Text>
+          <Text style={{marginBottom: SIZES.size_48}}>
+            Welcome back our esteemed fundi
           </Text>
           <TextInput
             dense={true}
@@ -82,7 +85,7 @@ const Login = ({navigation}) => {
                 style={{marginRight: SIZES.base}}
               />
             }
-            placeholder="phonenumber/email"
+            placeholder="Phonenumber / Email"
             value={email}
             onChangeText={txt => setEmail(txt)}
           />
@@ -97,7 +100,7 @@ const Login = ({navigation}) => {
                 style={{marginRight: SIZES.base}}
               />
             }
-            placeholder="password"
+            placeholder="Password"
             secureTextEntry={true}
             value={password}
             onChangeText={txt => setPassword(txt)}

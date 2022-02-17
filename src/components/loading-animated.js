@@ -2,7 +2,7 @@ import React from 'react';
 import LottieView from 'lottie-react-native';
 
 import {StyleSheet, View, Text} from 'react-native';
-import {FONTS, SIZES} from '../constants/themes';
+import {COLORS, FONTS, SIZES} from '../constants/themes';
 
 const VinyLoader = ({size = 32, loading = false}) => {
   if (loading)
@@ -53,6 +53,21 @@ const ArcherLoader = ({
       />
     );
   return null;
+};
+
+const Wave = ({height, width}) => {
+  <LottieView
+    source={require('../animations_files/wave.json')}
+    autoPlay
+    loop
+    colorFilters={[
+      {keypath: 'Shape Layer 5', color: COLORS.secondary},
+      {keypath: 'Shape Layer 6', color: COLORS.secondary},
+      {keypath: 'Shape Layer 7', color: COLORS.secondary},
+      {keypath: 'Shape Layer 8', color: COLORS.secondary},
+    ]}
+    style={[styles.vl_container, {height, width}]}
+  />;
 };
 
 const DoubleRing = ({
@@ -108,4 +123,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export {VinyLoader, RingedLoader, ArcherLoader, DoubleRing, MainScreen};
+export {VinyLoader, RingedLoader, ArcherLoader, DoubleRing, MainScreen, Wave};
