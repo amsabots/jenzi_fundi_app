@@ -47,11 +47,15 @@ const Register = ({navigation}) => {
       });
     setLoading(true);
     axios
-      .post(`${endpoints.client_service}/clients`, {name, email, password})
+      .post(`${endpoints.fundi_service}/accounts/register`, {
+        name,
+        email,
+        password,
+      })
       .then(async res => {
         dispatch(user_data_actions.create_user(res.data));
         await AsyncStorage.setItem(offline_data.user, JSON.stringify(res.data));
-        ToastAndroid.show('Welcome to Jenzi', ToastAndroid.LONG);
+        ToastAndroid.show('Welcome to Jenzi Smart', ToastAndroid.LONG);
       })
       .catch(err => errorMessage(err))
       .finally(() => setLoading(false));

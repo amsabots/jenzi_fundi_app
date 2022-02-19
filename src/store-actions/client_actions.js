@@ -1,4 +1,4 @@
-const fundiActions = {
+const clientActions = {
   add_fundi: function (fundis) {
     return {
       type: 'ADD_FUNDIS',
@@ -40,4 +40,4 @@ const fundiActions = {
     };
   },
 };
-export {fundiActions};
+export {clientActions};

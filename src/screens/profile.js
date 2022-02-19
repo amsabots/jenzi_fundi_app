@@ -7,7 +7,7 @@ import {
   Alert,
   ToastAndroid,
 } from 'react-native';
-import {Button, Caption, TextInput} from 'react-native-paper';
+import {Button, Caption, Chip, TextInput} from 'react-native-paper';
 //toast
 import Toast from 'react-native-toast-message';
 import {
@@ -36,6 +36,7 @@ import {MenuOption} from 'react-native-popup-menu';
 import axios from 'axios';
 import {endpoints, errorMessage} from '../endpoints';
 import {user_data_actions} from '../store-actions';
+import {screens} from '../constants';
 
 const PopupOption = ({onSelect}) => (
   <MenuOption onSelect={onSelect}>
@@ -153,6 +154,11 @@ const Profile = ({navigation, user_data}) => {
             </View>
             {/*  */}
             <Text>Contact: {phn || 'Not available'}</Text>
+            <Text
+              style={styles._location_update}
+              onPress={() => navigation.navigate(screens.location_picker)}>
+              Update current location
+            </Text>
           </View>
           {/* Section two - Edit the details above */}
           <Text style={styles._section_text}>Edit profile</Text>
@@ -282,6 +288,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     width: '100%',
+  },
+  _location_update: {
+    marginTop: SIZES.padding_32,
+    color: COLORS.secondary,
+    textDecorationLine: 'underline',
+    ...FONTS.body_bold,
   },
 });
 

@@ -1,13 +1,14 @@
 import Toast from 'react-native-toast-message';
 export const endpoints = {
-  notification_server: 'http://3.21.245.189:27500/realtime-server',
-  client_service: `http://3.21.245.189:27900/client/api`,
-  fundi_service: `http://3.21.245.189:27800/fundi/api`,
+  notification_server: 'http://18.217.178.254:27500/realtime-server',
+  client_service: `http://18.217.178.254:27900/client/api`,
+  fundi_service: `http://18.217.178.254:27800/fundi/api`,
 };
 
 export const errorMessage = err => {
   if (err.response) {
     const {data, status} = err.response;
+    console.log(data);
     Toast.show({
       type: 'error',
       text1: status === 403 ? 'Bad credetials' : 'Request failed',

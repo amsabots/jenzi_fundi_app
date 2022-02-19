@@ -13,6 +13,7 @@ const screens = {
   payments: 'Payments',
   logout: 'Logout',
   main_activity: 'MainActivity',
+  location_picker: 'LocationPicker',
 };
 
 export {screens};

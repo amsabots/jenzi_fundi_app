@@ -55,19 +55,21 @@ const ArcherLoader = ({
   return null;
 };
 
-const Wave = ({height, width}) => {
-  <LottieView
-    source={require('../animations_files/wave.json')}
-    autoPlay
-    loop
-    colorFilters={[
-      {keypath: 'Shape Layer 5', color: COLORS.secondary},
-      {keypath: 'Shape Layer 6', color: COLORS.secondary},
-      {keypath: 'Shape Layer 7', color: COLORS.secondary},
-      {keypath: 'Shape Layer 8', color: COLORS.secondary},
-    ]}
-    style={[styles.vl_container, {height, width}]}
-  />;
+const Wave = ({height = SIZES.size_48, width = SIZES.size_48}) => {
+  return (
+    <LottieView
+      source={require('../animations_files/wave.json')}
+      autoPlay
+      loop
+      colorFilters={[
+        {keypath: 'Shape Layer 5', color: COLORS.secondary},
+        {keypath: 'Shape Layer 6', color: COLORS.secondary},
+        {keypath: 'Shape Layer 7', color: COLORS.secondary},
+        {keypath: 'Shape Layer 8', color: COLORS.secondary},
+      ]}
+      style={[styles.vl_container, {height, width}]}
+    />
+  );
 };
 
 const DoubleRing = ({

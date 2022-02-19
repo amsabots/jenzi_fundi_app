@@ -11,43 +11,25 @@ import {endpoints} from '../endpoints';
 //pusher
 import {connectToChannel} from '.';
 
-const consumeUserInfo = c => {
+const consumeUserInfo = user_id => {
   //const dispatch = useDispatch();
 
-  const binder = connectToChannel(c);
+  const binder = connectToChannel(user_id);
   binder.bind('pusher:subscription_succeeded', () => {
     console.log(
-      'Channel has been established between client and puhser servers',
+      'Channel has been established between client and pusher servers',
     );
     //  USER ACCEPTED
-    binder.bind(pusher_filters.user_accepted, data => {
+    binder.bind(pusher_filters.request_user, data => {
       const {payload, sourceAddress, destinationAddress, requestId} = data;
-      console.log(requestId);
       axios
         .delete(`${endpoints.notification_server}/notify/${requestId}`)
         .then(() => 'done')
         .then(async re => {
-          axios
-            .post(
-              `${endpoints.client_service}/jobs`,
-              {
-                title: payload.title,
-                fundiId: sourceAddress,
-                client: {
-                  id: store.getState().user_data.user.id,
-                },
-              },
-              {timeout: 30000},
-            )
-            .then(f => {
-              store.dispatch(task_actions.add_job_entry([f.data]));
-              store.dispatch(UISettingsActions.show_project_banner(f.data));
-              return ToastAndroid.showWithGravity(
-                'Connection between you and the fundi has been set - You can freely chat on our messenger platform and track the project independently',
-                ToastAndroid.LONG,
-                ToastAndroid.CENTER,
-              );
-            });
+          const client = await axios.get(
+            `${endpoints.client_service}/clients/${sourceAddress}`,
+          );
+          console.log(client.data);
         })
         .catch(err => {
           console.log('===== PROJECT CREATION ERROR =======', err);

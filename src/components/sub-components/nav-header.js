@@ -35,7 +35,6 @@ const NavHeaderView = ({navigation, user_data}) => {
       <Button
         mode="contained"
         style={{marginTop: SIZES.padding_16, backgroundColor: COLORS.secondary}}
-        icon={'face-profile'}
         onPress={() => navigateToRoute()}>
         Profile
       </Button>

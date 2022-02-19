@@ -8,6 +8,7 @@ import ChatScreen from './chats';
 import payments from './payments';
 import Logout from './logout';
 import MainActivity from './main-activity';
+import LocationPicker from './location-picker';
 
 export {
   HomeView,
@@ -20,4 +21,5 @@ export {
   payments,
   Logout,
   MainActivity,
+  LocationPicker,
 };

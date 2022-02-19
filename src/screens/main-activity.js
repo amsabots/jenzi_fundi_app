@@ -40,7 +40,7 @@ const MainActivity = ({user_data}) => {
           });
       })
       .catch(err => dispatch(user_data_actions.delete_user()));
-  }, []);
+  }, [user_data]);
 
   return (
     <View style={styles.container}>

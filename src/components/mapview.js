@@ -10,12 +10,7 @@ import {connect} from 'react-redux';
 import {MapMarker} from '.';
 import {DoubleRing} from './loading-animated';
 
-const mapStateToProps = state => {
-  const {fundis} = state;
-  return {fundis};
-};
-
-const Mapview = ({coordinates, onMarkerClicked, fundis}) => {
+const Mapview = ({coordinates, onMarkerClicked}) => {
   const {latitude, longitude} = coordinates;
   const mapRef = useRef(null);
 
@@ -55,31 +50,6 @@ const Mapview = ({coordinates, onMarkerClicked, fundis}) => {
           </View>
         </Marker>
       )}
-      {fundis.fundis.length
-        ? fundis.fundis.map((element, idx) => {
-            const {
-              account: {latitude, longitude, accountId, name},
-              distance,
-            } = element;
-            return (
-              <Marker
-                coordinate={{
-                  latitude: parseFloat(latitude),
-                  longitude: parseFloat(longitude),
-                }}
-                title={name || 'Not available'}
-                onCalloutPress={() => onMarkerClicked(element)}
-                description={
-                  distance < 1
-                    ? (distance * 1000).toFixed(2) + ' Meters away'
-                    : distance + 'KMs away'
-                }
-                key={accountId}>
-                <MapMarker avatar_size={40} />
-              </Marker>
-            );
-          })
-        : null}
     </RNMapView>
   );
 };
@@ -119,4 +89,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export const MapView = connect(mapStateToProps)(memo(Mapview));
+export const MapView = memo(Mapview);

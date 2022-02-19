@@ -32,52 +32,10 @@ import {screens} from '../constants';
 
 const mapStateToProps = state => {
   const {fundis, user_data, ui_settings} = state;
-  return {fundis, user_data, ui_settings};
+  return {user_data, ui_settings};
 };
 
-const Home = ({navigation, fundis, user_data, ui_settings}) => {
-  const {project_banner} = ui_settings;
-
-  //component state
-  const [longitude, setLongitude] = useState();
-  const [latitude, setLatitude] = useState();
-  const [bannerVisible, setBannerVisible] = useState(false);
-  const [project_banner_visible, setProjectBannerVisibility] = useState(false);
-
-  //const refrproject_banneresh
-  const [find, setFinder] = useState(0);
-
-  // react dispatch
-  const dispatch = useDispatch();
-
-  //   get current map location
-  const location = async () => {
-    const l = await getCurrentLocation();
-    const {
-      accuracy: acc,
-      altitude: alt,
-      latitude: lat,
-      longitude: longi,
-    } = l.coords;
-    setLatitude(lat);
-    setLongitude(longi);
-
-    //update coordinates
-    if (lat && longi)
-      dispatch(user_data_actions.update_coordinates(lat, longi));
-  };
-
-  // handle clicked user maker on the map
-  const handleCalloutClick = useCallback(f => {
-    bottomSheetRef.current.snapTo(2);
-    dispatch(fundiActions.set_selected_fundi(f));
-  });
-
-  //bottom sheet
-  const bottomSheetRef = useRef(null);
-  // variables
-  const snapPoints = useMemo(() => ['35%', '50%', '90%'], []);
-
+const Home = ({navigation, user_data, ui_settings}) => {
   // back button Handler
   let backHandlerClickCount = 0;
   const backButtonHandler = () => {
@@ -99,98 +57,32 @@ const Home = ({navigation, fundis, user_data, ui_settings}) => {
     return true;
   };
 
-  useEffect(() => {
-    location();
-  }, [find]);
+  const subscribe_to_instances = useCallback(() => {
+    consume_from_pusher(user_data.user.accountId);
+  }, []);
+
+  const dispatch = useDispatch();
 
   //run on the first screen render
   useEffect(() => {
-    consume_from_pusher(user_data.user.clientId);
     BackHandler.addEventListener('hardwareBackPress', backButtonHandler);
+    //connect to pusher channel
+    subscribe_to_instances();
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      // Do something when the screen is focused
-      if (!fundis.fundis.length) setBannerVisible(true);
-      Object.keys(project_banner).length
-        ? setProjectBannerVisibility(true)
-        : setProjectBannerVisibility(false);
+      //check if the user has all information setup
+      const {user} = user_data;
+      if (!user.latitude) navigation.navigate(screens.location_picker);
+      dispatch(UISettingsActions.status_bar(false));
       return () => {
         BackHandler.removeEventListener('hardwareBackPress', backButtonHandler);
       };
-    }, []),
+    }, [user_data]),
   );
 
-  return (
-    <View style={[styles.container]}>
-      {/* Map container */}
-      <View style={styles._map_container}>
-        <View style={[styles._hamburger, styles._fab_container]}>
-          <MIcons
-            name="menu"
-            size={SIZES.icon_size}
-            color={COLORS.primary}
-            onPress={() => navigation.openDrawer()}
-          />
-        </View>
-        {/* ====================== BANNER SECTION ======================= */}
-        {/*  banner to show when new project has been initiated*/}
-        <Banner
-          visible={project_banner_visible}
-          actions={[
-            {
-              label: 'Connect',
-              onPress: () => {
-                dispatch(UISettingsActions.hide_project_banner());
-                navigation.navigate(screens.projects);
-              },
-            },
-            {
-              label: 'Close',
-              onPress: () => {
-                dispatch(UISettingsActions.hide_project_banner());
-              },
-            },
-          ]}
-          style={{
-            marginTop: SIZES.device.height / 8,
-          }}>
-          {`${'The fundi you just requested'} has accepted your job offer. Click connect to open the project and connect`}
-        </Banner>
-        {/* banner section to display state of fundis */}
-        {fundis.fundis.length < 1 && (
-          <Banner style={{top: 64}} visible={bannerVisible} actions={[]}>
-            There are no available fundis within your location.
-          </Banner>
-        )}
-        {/* ============================= */}
-        <View style={[styles._returnTocurrentPosition, styles._fab_container]}>
-          <MIcons
-            name="my-location"
-            size={SIZES.icon_size}
-            color={COLORS.primary}
-            onPress={() => setFinder(s => s + 1)}
-          />
-        </View>
-        <MapView
-          coordinates={!latitude || !longitude ? {} : {latitude, longitude}}
-          nearbyProviders={fundis.fundis}
-          onMarkerClicked={f => handleCalloutClick(f)}
-        />
-      </View>
-      <BottomSheet
-        ref={bottomSheetRef}
-        initialSnapIndex={1}
-        snapPoints={snapPoints}>
-        <ScrollView>
-          <HomeBottomSheetContent
-            bottomSheetTop={() => bottomSheetRef.current.snapTo(2)}
-          />
-        </ScrollView>
-      </BottomSheet>
-    </View>
-  );
+  return <View style={[styles.container]}>{/* Map container */}</View>;
 };
 
 const styles = StyleSheet.create({

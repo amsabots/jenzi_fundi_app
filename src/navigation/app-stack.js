@@ -9,6 +9,7 @@ import {
   ChatScreen,
   payments,
   Logout,
+  LocationPicker,
 } from '../screens';
 import {screens} from '../constants/screens';
 //navigation components
@@ -95,6 +96,7 @@ const AppDrawerNavigator = () => {
       <Stack.Screen name={screens.app_screen} component={DrawerNavigator} />
       <Stack.Screen name={screens.profile} component={Profile} />
       <Stack.Screen name={screens.logout} component={Logout} />
+      <Stack.Screen name={screens.location_picker} component={LocationPicker} />
     </Stack.Navigator>
   );
 };
