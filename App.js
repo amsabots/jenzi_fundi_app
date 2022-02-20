@@ -37,8 +37,6 @@ const delay = duration => {
 };
 
 const App = () => {
-  const [splashDone, setSplashDone] = React.useState(false);
-
   React.useEffect(() => {
     delay(3000).then(e => SplashScreen.hide());
   }, []);

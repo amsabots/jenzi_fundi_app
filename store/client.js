@@ -15,9 +15,8 @@ const clientsData = (state = initialState, action) => {
       console.log('new client request.....');
       return {...state, client_request: payload};
     case 'SET_ACTIVE_CLIENT':
+      console.log('set active client.....');
       return {...state, selected_client: payload};
-    case 'REMOVE_CLIENT_REQUEST':
-      return {...state, client_request: {}};
     case 'SET_ACCEPTED_TASK':
       return {...state, is_task_accepted: payload};
     case 'SET_REJECTED_TASK':

@@ -1,7 +1,11 @@
 import React from 'react';
-
 import {store} from '../../App';
-import {fundiActions, task_actions, UISettingsActions} from '../store-actions';
+import {
+  clientActions,
+  fundiActions,
+  task_actions,
+  UISettingsActions,
+} from '../store-actions';
 import Toast from 'react-native-toast-message';
 import {ToastAndroid} from 'react-native';
 import {pusher_filters} from '../constants';
@@ -13,7 +17,7 @@ import {connectToChannel} from '.';
 
 const consumeUserInfo = user_id => {
   //const dispatch = useDispatch();
-
+  let tracker = '';
   const binder = connectToChannel(user_id);
   binder.bind('pusher:subscription_succeeded', () => {
     console.log(
@@ -21,24 +25,35 @@ const consumeUserInfo = user_id => {
     );
     //  USER ACCEPTED
     binder.bind(pusher_filters.request_user, data => {
-      const {payload, sourceAddress, destinationAddress, requestId} = data;
-      axios
-        .delete(`${endpoints.notification_server}/notify/${requestId}`)
-        .then(() => 'done')
-        .then(async re => {
-          const client = await axios.get(
-            `${endpoints.client_service}/clients/${sourceAddress}`,
-          );
-          console.log(client.data);
-        })
-        .catch(err => {
-          console.log('===== PROJECT CREATION ERROR =======', err);
-          Toast.show({
-            type: 'error',
-            text1:
-              'We cannot initiate a direct link between you and the fundi. Please try again later',
+      const {
+        payload,
+        sourceAddress,
+        destinationAddress,
+        requestId,
+        retryLimit,
+      } = data;
+      if (!tracker) {
+        tracker = requestId;
+        axios
+          .get(`${endpoints.client_service}/clients/${sourceAddress}`)
+          .then(client => {
+            store.dispatch(
+              clientActions.set_active_client({
+                ...payload,
+                ...client.data,
+                requestId,
+              }),
+            );
+          })
+          .catch(err => {
+            console.log(err);
+          })
+          .finally(async () => {
+            await axios.delete(
+              `${endpoints.notification_server}/notify/${requestId}`,
+            );
           });
-        });
+      }
     });
     // USER REQUEST TIMEDOUT
     binder.bind(pusher_filters.request_user_timedout, data => {

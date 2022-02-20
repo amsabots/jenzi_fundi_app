@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "767171095114",
+    "project_id": "jenzi-1234d",
+    "storage_bucket": "jenzi-1234d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767171095114:android:a718817554f297308154b3",
+        "android_client_info": {
+          "package_name": "com.fundi_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "767171095114-2pr52480vdomknftm54q6k3hiej6mh32.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwGQLGm4nXTKLuWkbhGYEl-IrVu--42aY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "767171095114-2pr52480vdomknftm54q6k3hiej6mh32.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

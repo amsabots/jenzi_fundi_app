@@ -16,22 +16,6 @@ const user_data_actions = {
       type: 'REMOVE_USER',
     };
   },
-  update_coordinates: function (latitude, longitude) {
-    return {
-      type: 'UPDATE_POINTS',
-      payload: {
-        latitude,
-        longitude,
-      },
-    };
-  },
-
-  update_scan_radius: function (scan_radius) {
-    return {
-      type: 'UPDATE_SEARCH_RADIUS',
-      payload: scan_radius,
-    };
-  },
 };
 
 export {user_data_actions};

@@ -12,6 +12,7 @@ import {LoadingModal} from './loading-modal';
 import {MenuPopUp} from './menu-popup';
 import {ImageSelector} from './image-selector';
 import {MapMarker} from './google-map-fundi-marker';
+import AppRadioBtns from './radio-group';
 
 export {
   PrimaryStatusBar,
@@ -28,4 +29,5 @@ export {
   MenuPopUp,
   ImageSelector,
   MapMarker,
+  AppRadioBtns,
 };

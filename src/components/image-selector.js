@@ -37,6 +37,7 @@ const ImageSelector = ({
   onImagesPicked,
   buttonLabel = 'Submit',
   pickerLabel = 'Pick file',
+  clearImages,
 }) => {
   const snapPoints = useMemo(() => [0, '20%', '60%', '90%'], []);
   const [images, setImages] = useState([]);

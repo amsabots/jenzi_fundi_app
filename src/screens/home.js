@@ -31,11 +31,11 @@ import {connectToChannel, consume_from_pusher} from '../pusher';
 import {screens} from '../constants';
 
 const mapStateToProps = state => {
-  const {fundis, user_data, ui_settings} = state;
-  return {user_data, ui_settings};
+  const {user_data, clientsData} = state;
+  return {user_data, clientsData};
 };
 
-const Home = ({navigation, user_data, ui_settings}) => {
+const Home = ({navigation, user_data, clientsData}) => {
   // back button Handler
   let backHandlerClickCount = 0;
   const backButtonHandler = () => {
@@ -69,6 +69,11 @@ const Home = ({navigation, user_data, ui_settings}) => {
     //connect to pusher channel
     subscribe_to_instances();
   }, []);
+
+  //track changes on the clients data object
+  useEffect(() => {
+    console.log(clientsData);
+  }, [clientsData]);
 
   useFocusEffect(
     useCallback(() => {

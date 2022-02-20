@@ -1,13 +1,17 @@
 import React, {useState, useEffect, useRef} from 'react';
+import {View, Text, StyleSheet, ToastAndroid} from 'react-native';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  ToastAndroid,
-} from 'react-native';
-import {Button, Caption, Chip, TextInput} from 'react-native-paper';
+  Button,
+  Caption,
+  Chip,
+  TextInput,
+  Divider,
+  Snackbar,
+} from 'react-native-paper';
+import {ScrollView} from 'react-native-gesture-handler';
+import storage from '@react-native-firebase/storage';
+import {useFocusEffect} from '@react-navigation/native';
+
 //toast
 import Toast from 'react-native-toast-message';
 import {
@@ -17,14 +21,16 @@ import {
   InfoChips,
   MenuPopUp,
   ImageSelector,
+  AppRadioBtns,
 } from '../components';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 // icons
 import Icons from 'react-native-vector-icons/SimpleLineIcons';
-import MI from 'react-native-vector-icons/MaterialIcons';
+import DropDownPicker from 'react-native-dropdown-picker';
 // redux store
 import {UISettingsActions} from '../store-actions/ui-settings';
 import {useDispatch, connect} from 'react-redux';
+import random_gen from 'randomstring';
 
 const stateToProps = state => {
   const {user_data} = state;
@@ -36,7 +42,10 @@ import {MenuOption} from 'react-native-popup-menu';
 import axios from 'axios';
 import {endpoints, errorMessage} from '../endpoints';
 import {user_data_actions} from '../store-actions';
-import {screens} from '../constants';
+import {offline_data, screens} from '../constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// page sub components
 
 const PopupOption = ({onSelect}) => (
   <MenuOption onSelect={onSelect}>
@@ -44,28 +53,42 @@ const PopupOption = ({onSelect}) => (
   </MenuOption>
 );
 
+const account_visibility = [
+  {label: 'Engaged On - Account is invisible', value: true},
+  {label: 'Engaged Off - Account is visible', value: false},
+];
+
+const account_state = [
+  {label: 'Account Enabled', value: true},
+  {label: 'Disable account', value: false},
+];
+
 const Profile = ({navigation, user_data}) => {
+  const {user} = user_data;
   const {
-    accountBalance: acc_b,
-    accountType: acc_t,
-    active: actv,
-    clientId,
+    premium,
+    enabled,
+    accountId,
     createdAt: cr_at,
     email: em,
     name: nm,
     phoneNumber: phn,
-    secondaryPhonenumber: ph_s,
     verified: ve,
     userBackgroundColor,
-  } = user_data.user;
+    engaged: engage,
+    photoUrl: image_url,
+    id,
+  } = user;
   // ui variables - transient
   const [showLoader, setShowModal] = useState(false);
   const [name, setName] = useState('');
   const [phonenumber, setPhonenumber] = useState('');
-  const [phone2, setPhone2] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newpassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [engaged, setEngaged] = useState(null);
+  const [active, setActive] = useState(null);
+  const [photoUrl, setPhotoUrl] = useState(null);
 
   // referential variables - external behaviour
   const img_selector = useRef(null);
@@ -73,57 +96,92 @@ const Profile = ({navigation, user_data}) => {
   // redux store
   const dispatch = useDispatch();
 
-  // mount on the first render only
+  //===================== component functions ===========
+  const handlePickedImages = imgs => {
+    img_selector.current.snapTo(0);
+    const type_array = imgs[0].type.split('/');
+    const type = type_array[type_array.length - 1];
+    if (!['png', 'jpeg', 'webp', 'jpg'].includes(type))
+      return Toast.show({
+        type: 'error',
+        text1: 'File type error',
+        text2: 'Make sure the file selected is of type jpg, png or jpeg',
+        position: 'bottom',
+      });
+    // const reference = storage().ref(
+    //   `/jenzi_profile/${random_gen.generate({charset: 'hex'})}.png`,
+    // );
+    // const task = reference.putFile(imgs[0].fileCopyUri);
+    setPhotoUrl(imgs[0].fileCopyUri);
+    // task
+    //   .then(e => {
+    //     console.log(e);
+    //     return Toast.show({
+    //       type: 'success',
+    //       text1: 'Profile photo has been changed successfully',
+    //     });
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //     ToastAndroid.showWithGravity(
+    //       'Upload failed. Please try again later',
+    //       ToastAndroid.LONG,
+    //       ToastAndroid.CENTER,
+    //     );
+    //   });
+  };
+
+  const handleEditsUpdate = async () => {
+    setShowModal(true);
+    const update_user = {
+      ...user,
+      name: name || nm,
+      phoneNumber: phonenumber || phn,
+      engaged,
+      enabled: active,
+    };
+    delete update_user['id'];
+    try {
+      await axios.put(endpoints.fundi_service + '/accounts/' + id, update_user);
+      await AsyncStorage.setItem(
+        offline_data.user,
+        JSON.stringify({...update_user, id}),
+      );
+      dispatch(user_data_actions.update_user({...update_user, id}));
+      Toast.show({type: 'success', text1: 'Information updated successfully'});
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Encoutered an error, Please try again later',
+      });
+    } finally {
+      setShowModal(false);
+    }
+  };
+
   useEffect(() => {
     dispatch(UISettingsActions.status_bar(false));
   }, []);
 
-  //===================== component functions ===========
-  const handlePickedImages = imgs => {
-    img_selector.current.snapTo(0);
-    imgs.forEach(element => {
-      const type_array = element.split('.');
-      const type = type_array[type_array.length - 1];
-      if (!['png', 'jpeg', 'webp', 'jpg'].includes(type))
-        return Toast.show({
-          type: 'error',
-          text1: 'File type error',
-          text2: 'Make sure the file selected is of type jpg, png or jpeg',
-          position: 'bottom',
-        });
-    });
-  };
-
-  const handleEditsUpdate = () => {
-    setShowModal(true);
-    let user = user_data.user;
-    user = {
-      ...user,
-      name: name || nm,
-      phoneNumber: phonenumber || phn,
-      secondaryPhonenumber: phone2 || ph_s,
-    };
-    axios
-      .put(endpoints.client_service + '/clients/' + user_data.user.id, user)
-      .then(res => {
-        dispatch(
-          user_data_actions.create_user({...user, id: user_data.user.id}),
-        );
-        ToastAndroid.show(
-          'Account details update successfully',
-          ToastAndroid.LONG,
-        );
-      })
-      .catch(er => errorMessage(er))
-      .finally(() => setShowModal(false));
-  };
+  useFocusEffect(
+    React.useCallback(() => {
+      setActive(enabled);
+      setEngaged(engage);
+      setPhotoUrl(image_url);
+    }, [user_data]),
+  );
 
   return (
     <>
       {/* toolbar */}
       <DefaultToolBar navigation={navigation} title="Profile" />
       <View style={styles.container}>
-        <LoadingModal show={showLoader} onDismiss={() => setShowModal(false)} />
+        <LoadingModal
+          show={showLoader}
+          onDismiss={() => setShowModal(false)}
+          label="Updating...."
+        />
         <ScrollView>
           {/* section one - details preview */}
           <View style={[styles._section_card, styles._current_profile]}>
@@ -148,7 +206,7 @@ const Profile = ({navigation, user_data}) => {
                 textColor={COLORS.info}
               />
               <InfoChips
-                text={actv ? 'Active' : 'Disabled'}
+                text={enabled ? 'Active' : 'Disabled'}
                 textColor={COLORS.secondary}
               />
             </View>
@@ -165,7 +223,7 @@ const Profile = ({navigation, user_data}) => {
 
           <View style={[styles._section_card]}>
             <TextInput
-              label="Official Name"
+              label={nm || 'Official Name'}
               value={name}
               onChangeText={text => setName(text)}
               dense={true}
@@ -175,7 +233,7 @@ const Profile = ({navigation, user_data}) => {
               placeholder={nm}
             />
             <TextInput
-              label="Phone number"
+              label={phn || 'Phone number'}
               value={phonenumber}
               onChangeText={text => setPhonenumber(text)}
               dense={true}
@@ -183,16 +241,23 @@ const Profile = ({navigation, user_data}) => {
               activeUnderlineColor={COLORS.secondary}
               placeholder={phn}
             />
-            <TextInput
-              label="Phone Secondary phone number"
-              value={phone2}
-              dense={true}
-              onChangeText={text => setPhone2(text)}
-              style={[styles._std_margin]}
-              activeUnderlineColor={COLORS.secondary}
-              placeholder={ph_s}
-            />
+            <View style={{marginVertical: SIZES.padding_12}}>
+              <AppRadioBtns
+                selected={engaged}
+                options={account_visibility}
+                onRadioButtonChangeListener={v => setEngaged(v)}
+              />
+            </View>
+            <Divider />
             <View>
+              <AppRadioBtns
+                selected={active}
+                options={account_state}
+                onRadioButtonChangeListener={v => setActive(v)}
+              />
+            </View>
+
+            <View style={{marginTop: SIZES.padding_16}}>
               <Button
                 mode="outlined"
                 icon="pencil"
@@ -249,6 +314,7 @@ const Profile = ({navigation, user_data}) => {
           sheetRef={img_selector}
           onImagesPicked={imgs => handlePickedImages(imgs)}
           pickerLabel="Select profile image"
+          buttonLabel="Upload profile photo"
         />
       </View>
     </>
@@ -298,3 +364,14 @@ const styles = StyleSheet.create({
 });
 
 export default connect(stateToProps)(Profile);
+
+// [
+//   {
+//     fileCopyUri:
+//       'file:/data/user/0/com.fundi_app/cache/459fdec0-5d1d-4507-925c-842ce0cb5062/Screenshot_20220219-133922.png',
+//     name: 'Screenshot_20220219-133922.png',
+//     size: 602155,
+//     type: 'image/png',
+//     uri: 'content://com.android.providers.media.documents/document/image%3A4047',
+//   },
+// ];

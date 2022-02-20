@@ -14,6 +14,8 @@ const screens = {
   logout: 'Logout',
   main_activity: 'MainActivity',
   location_picker: 'LocationPicker',
+  rate_client: 'rateClient',
+  project_info: 'projectInfo',
 };
 
 export {screens};
