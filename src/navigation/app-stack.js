@@ -10,6 +10,8 @@ import {
   payments,
   Logout,
   LocationPicker,
+  ProjectInfo,
+  RateClient,
 } from '../screens';
 import {screens} from '../constants/screens';
 //navigation components
@@ -89,7 +91,7 @@ const DrawerNavigator = () => {
 const AppDrawerNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName={screens.app_screen}
+      initialRouteName={screens.project_info}
       screenOptions={{
         headerShown: false,
       }}>
@@ -97,6 +99,8 @@ const AppDrawerNavigator = () => {
       <Stack.Screen name={screens.profile} component={Profile} />
       <Stack.Screen name={screens.logout} component={Logout} />
       <Stack.Screen name={screens.location_picker} component={LocationPicker} />
+      <Stack.Screen name={screens.rate_client} component={RateClient} />
+      <Stack.Screen name={screens.project_info} component={ProjectInfo} />
     </Stack.Navigator>
   );
 };

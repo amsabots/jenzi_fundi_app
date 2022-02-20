@@ -1,7 +1,6 @@
 import React, {useEffect, useState, useCallback, useMemo, useRef} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {View, StyleSheet, BackHandler, ToastAndroid} from 'react-native';
-import {getCurrentLocation} from '../config/current-location';
 
 //bottom sheet
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -9,26 +8,17 @@ import {Banner} from 'react-native-paper';
 
 // redux store
 import {useDispatch, connect} from 'react-redux';
-import {
-  fundiActions,
-  UISettingsActions,
-  user_data_actions,
-} from '../store-actions';
+import {UISettingsActions} from '../store-actions';
 
 //components
-import {MapView} from '../components';
 import {COLORS, SIZES} from '../constants/themes';
 
-//icons
-import MIcons from 'react-native-vector-icons/MaterialIcons';
-
-//building blocks
-import {HomeBottomSheetContent} from './ui-views';
-import {ScrollView} from 'react-native-gesture-handler';
-
 // subscribtions
-import {connectToChannel, consume_from_pusher} from '../pusher';
+import {consume_from_pusher} from '../pusher';
 import {screens} from '../constants';
+
+//test UIs
+import {ProjectInfo} from '.';
 
 const mapStateToProps = state => {
   const {user_data, clientsData} = state;
@@ -87,40 +77,12 @@ const Home = ({navigation, user_data, clientsData}) => {
     }, [user_data]),
   );
 
-  return <View style={[styles.container]}>{/* Map container */}</View>;
+  return null;
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  _map_container: {
-    height: '65%',
-  },
-  _hamburger: {
-    top: SIZES.padding_32,
-    left: SIZES.icon_size,
-  },
-  _fab_container: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 25,
-    backgroundColor: COLORS.white,
-    zIndex: 10,
-    height: 48,
-    width: 48,
-    shadowColor: 'black',
-    shadowOffset: {
-      width: 1,
-      height: 1,
-    },
-    shadowRadius: 1.5,
-    elevation: 4,
-  },
-  _returnTocurrentPosition: {
-    bottom: SIZES.padding_32,
-    right: SIZES.icon_size,
   },
 });
 

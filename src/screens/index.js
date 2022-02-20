@@ -9,6 +9,8 @@ import payments from './payments';
 import Logout from './logout';
 import MainActivity from './main-activity';
 import LocationPicker from './location-picker';
+import RateClient from './rate-client';
+import ProjectInfo from './project-info';
 
 export {
   HomeView,
@@ -22,4 +24,6 @@ export {
   Logout,
   MainActivity,
   LocationPicker,
+  ProjectInfo,
+  RateClient,
 };

@@ -4,7 +4,6 @@ import {CustomDrawer} from './custom-drawer';
 import {CircularImage} from './circular-image';
 import {MapView} from './mapview';
 import {LoadingNothing} from './nothing-loading';
-import {FundiDetails} from './fundi-profile';
 import {ReviewContainer} from './review-component';
 import {DefaultToolBar} from './default-tool-bar';
 import {InfoChips} from './info-chips';
@@ -13,6 +12,8 @@ import {MenuPopUp} from './menu-popup';
 import {ImageSelector} from './image-selector';
 import {MapMarker} from './google-map-fundi-marker';
 import AppRadioBtns from './radio-group';
+import ClientDetails from './client-profile';
+import Reviews from './review-bottom-sheet';
 
 export {
   PrimaryStatusBar,
@@ -21,7 +22,6 @@ export {
   MapView,
   CircularImage,
   LoadingNothing,
-  FundiDetails,
   ReviewContainer,
   DefaultToolBar,
   InfoChips,
@@ -30,4 +30,6 @@ export {
   ImageSelector,
   MapMarker,
   AppRadioBtns,
+  ClientDetails,
+  Reviews,
 };
