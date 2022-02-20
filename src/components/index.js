@@ -4,7 +4,6 @@ import {CustomDrawer} from './custom-drawer';
 import {CircularImage} from './circular-image';
 import {MapView} from './mapview';
 import {LoadingNothing} from './nothing-loading';
-import {ReviewContainer} from './review-component';
 import {DefaultToolBar} from './default-tool-bar';
 import {InfoChips} from './info-chips';
 import {LoadingModal} from './loading-modal';
@@ -22,7 +21,6 @@ export {
   MapView,
   CircularImage,
   LoadingNothing,
-  ReviewContainer,
   DefaultToolBar,
   InfoChips,
   LoadingModal,
