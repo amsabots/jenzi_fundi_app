@@ -1,15 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {View, Text, StyleSheet, ToastAndroid} from 'react-native';
-import {
-  Button,
-  Caption,
-  Chip,
-  TextInput,
-  Divider,
-  Snackbar,
-} from 'react-native-paper';
+import {Button, Caption, TextInput, Divider} from 'react-native-paper';
 import {ScrollView} from 'react-native-gesture-handler';
-import storage from '@react-native-firebase/storage';
 import {useFocusEffect} from '@react-navigation/native';
 
 //toast
@@ -26,11 +18,13 @@ import {
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 // icons
 import Icons from 'react-native-vector-icons/SimpleLineIcons';
-import DropDownPicker from 'react-native-dropdown-picker';
 // redux store
 import {UISettingsActions} from '../store-actions/ui-settings';
 import {useDispatch, connect} from 'react-redux';
-import random_gen from 'randomstring';
+
+//subcomponents
+import AccountCustomization from './sub-components/profile-account-customization';
+import ResetPassword from './sub-components/profile-reset-password';
 
 const stateToProps = state => {
   const {user_data} = state;
@@ -83,9 +77,6 @@ const Profile = ({navigation, user_data}) => {
   const [showLoader, setShowModal] = useState(false);
   const [name, setName] = useState('');
   const [phonenumber, setPhonenumber] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newpassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [engaged, setEngaged] = useState(null);
   const [active, setActive] = useState(null);
   const [photoUrl, setPhotoUrl] = useState(null);
@@ -218,7 +209,6 @@ const Profile = ({navigation, user_data}) => {
               Update current location
             </Text>
           </View>
-          {/* Section two - Edit the details above */}
           <Text style={styles._section_text}>Edit profile</Text>
 
           <View style={[styles._section_card]}>
@@ -267,46 +257,18 @@ const Profile = ({navigation, user_data}) => {
               </Button>
             </View>
           </View>
+
+          {/* Section three - Tags */}
+          <Text style={styles._section_text}>Account customization</Text>
+
+          <View style={[styles._section_card]}>
+            <AccountCustomization user={user_data.user} />
+          </View>
+
           {/* section three - password reset */}
           <Text style={styles._section_text}>Password reset</Text>
           <View style={[styles._section_card]}>
-            <TextInput
-              label="Current password"
-              value={currentPassword}
-              secureTextEntry={true}
-              dense={true}
-              mode="outlined"
-              onChangeText={text => setCurrentPassword(text)}
-              style={[styles._std_margin]}
-              activeOutlineColor={COLORS.secondary}
-            />
-            <TextInput
-              label="New password"
-              value={newpassword}
-              secureTextEntry={true}
-              dense={true}
-              mode="outlined"
-              onChangeText={text => setNewPassword(text)}
-              style={[styles._std_margin]}
-              activeOutlineColor={COLORS.secondary}
-            />
-            <TextInput
-              label="Confirm password"
-              value={confirmPassword}
-              secureTextEntry={true}
-              dense={true}
-              mode="outlined"
-              onChangeText={text => setConfirmPassword(text)}
-              style={[styles._std_margin]}
-              activeOutlineColor={COLORS.secondary}
-            />
-            <View style={{alignItems: 'flex-start'}}>
-              <Button
-                mode="contained"
-                style={{backgroundColor: COLORS.secondary}}>
-                Reset Password
-              </Button>
-            </View>
+            <ResetPassword user={user_data.user} />
           </View>
           {/* section three */}
         </ScrollView>

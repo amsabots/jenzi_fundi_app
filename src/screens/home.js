@@ -108,7 +108,6 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
   useFocusEffect(
     useCallback(() => {
       //check if the user has all information setup
-      const {user} = user_data;
       if (!user.latitude) navigation.navigate(screens.location_picker);
       dispatch(UISettingsActions.status_bar(false));
       return () => {
