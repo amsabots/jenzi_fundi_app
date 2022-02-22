@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: SIZES.base,
     alignSelf: 'baseline',
+    borderRadius: SIZES.padding_4,
   },
 });
 

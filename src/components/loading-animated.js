@@ -55,20 +55,27 @@ const ArcherLoader = ({
   return null;
 };
 
-const Wave = ({height = SIZES.size_48, width = SIZES.size_48}) => {
+const Wave = ({
+  height = SIZES.size_48,
+  width = SIZES.size_48,
+  top_label,
+  topLabelColor = COLORS.secondary,
+}) => {
   return (
-    <LottieView
-      source={require('../animations_files/wave.json')}
-      autoPlay
-      loop
-      colorFilters={[
-        {keypath: 'Shape Layer 5', color: COLORS.secondary},
-        {keypath: 'Shape Layer 6', color: COLORS.secondary},
-        {keypath: 'Shape Layer 7', color: COLORS.secondary},
-        {keypath: 'Shape Layer 8', color: COLORS.secondary},
-      ]}
-      style={[styles.vl_container, {height, width}]}
-    />
+    <View style={[styles.vl_container, {height, width}]}>
+      {top_label && <Text style={{color: topLabelColor}}>{top_label}</Text>}
+      <LottieView
+        source={require('../animations_files/wave.json')}
+        autoPlay
+        loop
+        colorFilters={[
+          {keypath: 'Shape Layer 5', color: COLORS.secondary},
+          {keypath: 'Shape Layer 6', color: COLORS.secondary},
+          {keypath: 'Shape Layer 7', color: COLORS.secondary},
+          {keypath: 'Shape Layer 8', color: COLORS.secondary},
+        ]}
+      />
+    </View>
   );
 };
 
@@ -120,7 +127,6 @@ const MainScreen = ({height = 32, width = 32, loading = false}) => {
 
 const styles = StyleSheet.create({
   vl_container: {
-    flexDirection: 'row',
     alignItems: 'center',
   },
 });

@@ -7,7 +7,7 @@ import {COLORS, FONTS, SIZES} from '../constants/themes';
 const LoadingNothing = ({
   label,
   textColor = COLORS.secondary,
-  height = SIZES.device.height / 3,
+  height = 150,
   width = SIZES.device.width / 1.3,
 }) => {
   return (

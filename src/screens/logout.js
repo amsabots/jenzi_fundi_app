@@ -19,7 +19,7 @@ import Toast from 'react-native-toast-message';
 import {LoadingModal} from '../components';
 import axios from 'axios';
 import asyncStorage from '@react-native-async-storage/async-storage';
-import {offline_data} from '../constants';
+import {offline_data, screens} from '../constants';
 
 const mapStateToProps = state => {
   const {user_data} = state;
@@ -76,8 +76,13 @@ const Logout = ({navigation, user_data}) => {
           dispatch(user_data_actions.delete_user());
           await asyncStorage.removeItem(offline_data.user);
         })
-        .catch(e => {
-          errorMessage(e);
+        .catch(async e => {
+          dispatch(user_data_actions.delete_user());
+          await asyncStorage.removeItem(offline_data.user);
+          navigation.reset({
+            index: 0,
+            routes: [{name: screens.stack_auth}],
+          });
         })
         .finally(() => setModalShow(false));
     } else if (type === 'delete') {

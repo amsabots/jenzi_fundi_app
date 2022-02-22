@@ -48,12 +48,6 @@ const PaymentHistory = () => {
           <Text style={{...FONTS.body1, color: COLORS.white}}>KSHS. 0</Text>
         </View>
         {/* =================== */}
-        <View>
-          <Text style={{...FONTS.body, color: COLORS.white}}>
-            TOTAL OVERDRAFT
-          </Text>
-          <Text style={{...FONTS.body1, color: COLORS.white}}>KSHS. 0</Text>
-        </View>
       </View>
       {/* left */}
       <View
@@ -87,9 +81,9 @@ const PaymentsView = ({fundis, transactions, navigation}) => {
       <View style={styles.wrapper}>
         {/* ==== Top section ===== */}
         <View style={styles.header}>
-          <Text style={{...FONTS.body_bold}}>BALANCE</Text>
+          <Text style={{...FONTS.body_bold}}>Earnings</Text>
           <Text style={{...FONTS.h5}}>KSHS. 0</Text>
-          <Caption style={{...FONTS.body_medium}}>OVERDRAFT: KSHS. 0</Caption>
+          <Caption style={{...FONTS.body_medium}}>Charges: KSHS. 0</Caption>
         </View>
 
         <PaymentHistory />

@@ -56,6 +56,10 @@ const Register = ({navigation}) => {
         dispatch(user_data_actions.create_user(res.data));
         await AsyncStorage.setItem(offline_data.user, JSON.stringify(res.data));
         ToastAndroid.show('Welcome to Jenzi Smart', ToastAndroid.LONG);
+        navigation.reset({
+          index: 0,
+          routes: [{name: screens.main_activity}],
+        });
       })
       .catch(err => errorMessage(err))
       .finally(() => setLoading(false));

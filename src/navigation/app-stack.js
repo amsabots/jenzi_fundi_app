@@ -50,15 +50,6 @@ const DrawerNavigator = () => {
         }}
       />
       <Drawer.Screen
-        name={screens.projects}
-        component={Projects}
-        options={{
-          drawerIcon: ({color}) => (
-            <F5 name="tasks" size={SIZES.icon_size_focused} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
         name={screens.chats_screen}
         component={ChatScreen}
         options={{
@@ -91,7 +82,7 @@ const DrawerNavigator = () => {
 const AppDrawerNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName={screens.project_info}
+      initialRouteName={screens.app_screen}
       screenOptions={{
         headerShown: false,
       }}>

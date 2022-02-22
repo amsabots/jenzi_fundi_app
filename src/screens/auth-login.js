@@ -39,7 +39,7 @@ const Login = ({navigation}) => {
       );
     setLoading(true);
     axios
-      .post(`${endpoints.client_service}/clients/details-email`, {
+      .post(`${endpoints.fundi_service}/accounts/login`, {
         email: email.toLowerCase(),
         password,
       })
@@ -47,6 +47,10 @@ const Login = ({navigation}) => {
         await AsyncStorage.setItem(offline_data.user, JSON.stringify(res.data));
         dispatch(user_data_actions.create_user(res.data));
         ToastAndroid.show('Welcome to Jenzi smart', ToastAndroid.LONG);
+        navigation.reset({
+          index: 0,
+          routes: [{name: screens.main_activity}],
+        });
       })
       .catch(err => {
         errorMessage(err);
@@ -60,7 +64,11 @@ const Login = ({navigation}) => {
     <ScrollView style={{backgroundColor: COLORS.white}}>
       <View style={styles.container}>
         <View>
-          <LoadingNothing label={'JENZI SMART'} textColor={COLORS.white} />
+          <LoadingNothing
+            label={'JENZI SMART'}
+            textColor={COLORS.white}
+            height={180}
+          />
         </View>
 
         <View style={styles.wrapper}>
