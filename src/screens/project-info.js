@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {
   View,
   Text,
@@ -17,12 +17,15 @@ import {
   Dialog,
 } from 'react-native-paper';
 
-import {ClientDetails, Reviews, LoadingNothing, InfoChips} from '../components';
+import {ClientDetails, LoadingNothing, InfoChips} from '../components';
 
 //redux
 import {connect, useDispatch} from 'react-redux';
 import {UISettingsActions} from '../store-actions';
 import {ScrollView} from 'react-native-gesture-handler';
+
+//ui subcomponets
+import ProjectCancelOrDispute from './sub-components/task-action-reposnder';
 
 const mapStateToProps = state => {
   const {user_data} = state;
@@ -42,16 +45,24 @@ const SectionTitle = ({label}) => {
   );
 };
 
-const ProjectInfo = ({navigation, user_data}) => {
+const ProjectInfo = ({navigation, user_data, route}) => {
   //component state variables
-  const [action, setAction] = useState('');
   const [ready, setIsReady] = useState(false);
   const [confirmAction, setConfirmAction] = useState(false);
-  const [confrimActionLabel, setConfirmActionLabel] = useState('');
+  const [sheetActionType, setSheetActionType] = useState('');
+  const sheetRef = useRef();
+
+  const {item} = route.params;
+
+  const handleSheetOpenRequest = type => {
+    setSheetActionType(type);
+    sheetRef.current.snapTo(1);
+  };
+
+  function update_job_entry() {}
 
   //component hooks
   const dispatch = useDispatch();
-  const btmSheetRef = useRef(null);
 
   //component event handlers
   const handleActionChange = () => {
@@ -69,84 +80,103 @@ const ProjectInfo = ({navigation, user_data}) => {
   return !ready ? (
     <ActivityIndicator size={SIZES.padding_32} color={COLORS.secondary} />
   ) : (
-    <ScrollView style={styles.container}>
-      <EnIcon
-        name="cross"
-        size={SIZES.padding_32}
-        style={styles._cancel}
-        color={COLORS.secondary}
-        onPress={() => navigation.goBack()}
-      />
-      {/* ===========   PAGE CLIENT DETAILS ============= */}
+    <>
+      <ScrollView style={styles.container}>
+        <EnIcon
+          name="cross"
+          size={SIZES.padding_32}
+          style={styles._cancel}
+          color={COLORS.secondary}
+          onPress={() => navigation.goBack()}
+        />
+        {/* ===========   PAGE CLIENT DETAILS ============= */}
 
-      <ClientDetails />
-      {/*  ========== PAGE PROJECT INFO ================= */}
-      <Text
-        style={{...FONTS.body, fontWeight: 'bold', padding: SIZES.padding_16}}>
-        Project Details
-      </Text>
-      {/* ============================================== */}
-      <View style={styles._project_details}>
-        <Banner
-          actions={[]}
-          visible={true}
-          contentStyle={{backgroundColor: COLORS.light_secondary}}>
-          <Text style={{color: COLORS.secondary, ...FONTS.caption}}>
-            Any special information about the project will appear here
-          </Text>
-        </Banner>
-        {/* ============== TITLE AND BLA BLAS ================== */}
-        <View style={{marginTop: SIZES.padding_16}}>
-          <SectionTitle label=" Project title:" />
-          <Text style={{color: COLORS.secondary, ...FONTS.body}}>
-            Project two
-          </Text>
-          <Divider style={{marginVertical: SIZES.padding_12}} />
-          {/* ======= REQUIREMENTS AND SHIT ============== */}
+        <ClientDetails />
+        {/*  ========== PAGE PROJECT INFO ================= */}
+        <Text
+          style={{
+            ...FONTS.body,
+            fontWeight: 'bold',
+            padding: SIZES.padding_16,
+          }}>
+          Project Details
+        </Text>
+        {/* ============================================== */}
+        <View style={styles._project_details}>
+          <Banner
+            actions={[]}
+            visible={true}
+            contentStyle={{backgroundColor: COLORS.light_secondary}}>
+            <Text style={{color: COLORS.secondary, ...FONTS.caption}}>
+              Any special information about the project will appear here
+            </Text>
+          </Banner>
+          {/* ============== TITLE AND BLA BLAS ================== */}
+          <View style={{marginTop: SIZES.padding_16}}>
+            <SectionTitle label=" Project title:" />
+            <Text style={{color: COLORS.secondary, ...FONTS.body}}>
+              Project two
+            </Text>
+            <Divider style={{marginVertical: SIZES.padding_12}} />
+            {/* ======= REQUIREMENTS AND SHIT ============== */}
 
-          <SectionTitle label=" Requirements:" />
-          <View>
-            <LoadingNothing
-              label={'Requirements not available'}
-              height={120}
-              width={120}
-            />
-          </View>
-          <Divider style={{marginVertical: SIZES.padding_12}} />
-          {/* ========== TASK STATE AND TIMELINE =========== */}
-          <SectionTitle label="Extra info:" />
-          <View style={styles._extra_info}>
-            <InfoChips text={'On going'} textColor={COLORS.secondary} />
-            <Text>Posted: 3 mins ago</Text>
-          </View>
-          {/* ============= ACTIONS - BUTTONS AND SHIT ========== */}
-          <Divider style={{marginVertical: SIZES.padding_12}} />
-          <SectionTitle label="Actions:" />
-          <View style={styles._action_btn}>
-            <Chip
-              style={{backgroundColor: COLORS.secondary}}
-              onPress={handleActionChange}>
-              <Text style={{color: COLORS.white}}>Complete</Text>
-            </Chip>
-            <Chip
-              style={{
-                backgroundColor: COLORS.primary,
-                marginHorizontal: SIZES.padding_4,
-              }}
-              onPress={() => setAction('DISPUTED')}>
-              <Text style={{color: COLORS.white}}>Raise dispute</Text>
-            </Chip>
-            <Chip
-              style={{backgroundColor: COLORS.blue_deep}}
-              onPress={() => setAction('CANCEL')}>
-              <Text style={{color: COLORS.white}}>Cancel</Text>
-            </Chip>
+            <SectionTitle label=" Requirements:" />
+            <View>
+              <LoadingNothing
+                label={'Requirements not available'}
+                height={120}
+                width={120}
+              />
+            </View>
+            <Divider style={{marginVertical: SIZES.padding_12}} />
+            {/* ========== TASK STATE AND TIMELINE =========== */}
+            <SectionTitle label="Extra info:" />
+            <View style={styles._extra_info}>
+              <InfoChips text={'On going'} textColor={COLORS.secondary} />
+              <Text>Posted: 3 mins ago</Text>
+            </View>
+            {/* ============= ACTIONS - BUTTONS AND SHIT ========== */}
+            <Divider style={{marginVertical: SIZES.padding_12}} />
+            <SectionTitle label="Actions:" />
+            <View style={styles._action_btn}>
+              <Chip
+                style={{backgroundColor: COLORS.secondary}}
+                onPress={handleActionChange}>
+                <Text style={{color: COLORS.white, ...FONTS.caption}}>
+                  Complete
+                </Text>
+              </Chip>
+              <Chip
+                style={{
+                  backgroundColor: COLORS.primary,
+                  marginHorizontal: SIZES.padding_4,
+                }}
+                onPress={() => handleSheetOpenRequest('DISPUTE')}>
+                <Text style={{color: COLORS.white, ...FONTS.caption}}>
+                  Raise dispute
+                </Text>
+              </Chip>
+              <Chip
+                style={{backgroundColor: COLORS.blue_deep}}
+                onPress={() => handleSheetOpenRequest('CANCEL')}>
+                <Text style={{color: COLORS.white, ...FONTS.caption}}>
+                  Cancel
+                </Text>
+              </Chip>
+            </View>
           </View>
         </View>
-      </View>
+      </ScrollView>
 
       {/* ======== NON STACKABLE COMPONENTS */}
-      <Reviews bottomSheetRef={btmSheetRef} />
+      {/* ======== CANCEL OR RAISE DISPUTE ======= */}
+      <ProjectCancelOrDispute
+        sheetRef={sheetRef}
+        job_item={item}
+        type={sheetActionType}
+        dismissListener={() => sheetRef.current.snapTo(0)}
+      />
+      {/* ======== COMPLETE PROJECT =========== */}
       <Portal>
         <Dialog
           visible={confirmAction}
@@ -155,18 +185,21 @@ const ProjectInfo = ({navigation, user_data}) => {
           <Dialog.Content>
             <Text>
               Please confirm that you want to change the job state to complete.
-              We will send an alert to client to confirm or decline your request
+              We will send an alert to the client to confirm or decline your
+              request
             </Text>
             <Divider style={{marginTop: SIZES.padding_16}} />
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Button onPress={() => setConfirmAction(false)}>Cancel</Button>
-              <Button color={COLORS.secondary}>Complete</Button>
+              <Button color={COLORS.secondary} onPress={() => update_job_entry}>
+                Complete
+              </Button>
             </View>
           </Dialog.Content>
         </Dialog>
       </Portal>
-    </ScrollView>
+    </>
   );
 };
 

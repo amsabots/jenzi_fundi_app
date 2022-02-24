@@ -52,8 +52,6 @@ export const NothingToShow = (
 
 // project item - for the flatlist
 const ProjectItem = ({onItemClick, item}) => {
-  const [isReady, setReady] = useState(false);
-
   const task_state_color = task_state => {
     switch (task_state) {
       case 'ONGOING':
@@ -69,16 +67,7 @@ const ProjectItem = ({onItemClick, item}) => {
     }
   };
 
-  // run on the initial screen render
-  useEffect(() => {
-    InteractionManager.runAfterInteractions(() => {
-      setReady(true);
-    });
-  }, []);
-
-  return !isReady ? (
-    <ActivityIndicator color={COLORS.secondary} size={SIZES.padding_32} />
-  ) : (
+  return (
     <TouchableOpacity
       activeOpacity={0.9}
       style={[styles._item_card, {borderLeftColor: COLORS.secondary}]}
@@ -123,9 +112,9 @@ const ProjectsView = ({tasks, navigation}) => {
     }
   }
 
-  // useEffect(() => {
-  //   loadProjects();
-  // }, []);
+  useEffect(() => {
+    loadProjects();
+  }, []);
   return (
     <View style={styles.container}>
       <View style={styles._content_wrapper}>

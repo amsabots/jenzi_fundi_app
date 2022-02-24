@@ -114,6 +114,7 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
       dispatch(UISettingsActions.status_bar(false));
       return () => {
         BackHandler.removeEventListener('hardwareBackPress', backButtonHandler);
+        setLoad(false);
       };
     }, [user_data]),
   );
