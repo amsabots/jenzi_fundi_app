@@ -1,9 +1,16 @@
 import React, {useEffect, useState, useCallback, useMemo, useRef} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
-import {View, StyleSheet, BackHandler, ToastAndroid, Text} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  BackHandler,
+  ToastAndroid,
+  Text,
+  InteractionManager,
+  ActivityIndicator,
+} from 'react-native';
 
 //bottom sheet
-import {Banner, Chip, Badge, Switch} from 'react-native-paper';
 
 // redux store
 import {useDispatch, connect} from 'react-redux';
@@ -34,15 +41,6 @@ export const LoaderView = (
   <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
     <LoaderSpinner.ArcherLoader size={180} loading={true} />
     <Text>Fetching projects......</Text>
-  </View>
-);
-
-export const NothingToShow = (
-  <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-    <LoadingNothing
-      height={150}
-      label={'Job history unavailable at the moment'}
-    />
   </View>
 );
 
@@ -84,6 +82,7 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
       setLoad(true);
       const res = await axios.get(
         `${endpoints.fundi_service}/projects/${user.id}?page=0&pageSize=20`,
+        {timeout: 7000},
       );
       const {data} = res.data;
       if (data.length) dispatch(task_actions.load_jobs(data));
@@ -100,10 +99,13 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
     //connect to pusher channel
     subscribe_to_instances();
     load_jobs();
+    return () => {
+      setLoad(false);
+    };
   }, []);
 
   //track changes on the clients data object
-  useEffect(() => {}, [clientsData]);
+  // useEffect(() => {}, [clientsData]);
 
   useFocusEffect(
     useCallback(() => {
@@ -146,7 +148,7 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
       </View>
       {/* ============ CONTENT AREA ================= */}
       <View style={styles.content}>
-        {load ? LoaderView : jobs.length ? null : NothingToShow}
+        {load ? LoaderView : <Projects navigation={navigation} />}
       </View>
       <ProjectAlert />
     </View>

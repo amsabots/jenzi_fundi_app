@@ -1,17 +1,23 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  InteractionManager,
+} from 'react-native';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 import EnIcon from 'react-native-vector-icons/Entypo';
-import {Divider, Button, Banner, Chip} from 'react-native-paper';
-
 import {
-  LoadingModal,
-  ClientDetails,
-  Reviews,
-  LoaderSpinner,
-  LoadingNothing,
-  InfoChips,
-} from '../components';
+  Divider,
+  Button,
+  Banner,
+  Chip,
+  Portal,
+  Dialog,
+} from 'react-native-paper';
+
+import {ClientDetails, Reviews, LoadingNothing, InfoChips} from '../components';
 
 //redux
 import {connect, useDispatch} from 'react-redux';
@@ -39,19 +45,30 @@ const SectionTitle = ({label}) => {
 const ProjectInfo = ({navigation, user_data}) => {
   //component state variables
   const [action, setAction] = useState('');
+  const [ready, setIsReady] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(false);
+  const [confrimActionLabel, setConfirmActionLabel] = useState('');
 
   //component hooks
   const dispatch = useDispatch();
   const btmSheetRef = useRef(null);
 
   //component event handlers
-  const handleActionChange = action => {};
+  const handleActionChange = () => {
+    setConfirmAction(true);
+  };
 
   //use effect hooks
   useEffect(() => {
     dispatch(UISettingsActions.status_bar(false));
+
+    InteractionManager.runAfterInteractions(() => {
+      setIsReady(true);
+    });
   }, []);
-  return (
+  return !ready ? (
+    <ActivityIndicator size={SIZES.padding_32} color={COLORS.secondary} />
+  ) : (
     <ScrollView style={styles.container}>
       <EnIcon
         name="cross"
@@ -108,7 +125,7 @@ const ProjectInfo = ({navigation, user_data}) => {
           <View style={styles._action_btn}>
             <Chip
               style={{backgroundColor: COLORS.secondary}}
-              onPress={() => setAction('COMPLETE')}>
+              onPress={handleActionChange}>
               <Text style={{color: COLORS.white}}>Complete</Text>
             </Chip>
             <Chip
@@ -130,6 +147,25 @@ const ProjectInfo = ({navigation, user_data}) => {
 
       {/* ======== NON STACKABLE COMPONENTS */}
       <Reviews bottomSheetRef={btmSheetRef} />
+      <Portal>
+        <Dialog
+          visible={confirmAction}
+          onDismiss={() => setConfirmAction(false)}>
+          <Dialog.Title>Confirm action change</Dialog.Title>
+          <Dialog.Content>
+            <Text>
+              Please confirm that you want to change the job state to complete.
+              We will send an alert to client to confirm or decline your request
+            </Text>
+            <Divider style={{marginTop: SIZES.padding_16}} />
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Button onPress={() => setConfirmAction(false)}>Cancel</Button>
+              <Button color={COLORS.secondary}>Complete</Button>
+            </View>
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
     </ScrollView>
   );
 };

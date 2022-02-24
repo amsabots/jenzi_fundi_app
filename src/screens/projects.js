@@ -1,5 +1,19 @@
-import React, {useEffect, useRef, useCallback, useState, useMemo} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {
+  useEffect,
+  useRef,
+  useCallback,
+  useState,
+  useMemo,
+  memo,
+} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  InteractionManager,
+  ActivityIndicator,
+} from 'react-native';
 // redux store
 import {UISettingsActions} from '../store-actions/ui-settings';
 import {connect, useDispatch} from 'react-redux';
@@ -25,8 +39,21 @@ import {endpoints, errorMessage} from '../endpoints';
 import {task_actions} from '../store-actions/task-actions';
 import {screens} from '../constants';
 
+//
+
+export const NothingToShow = (
+  <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+    <LoadingNothing
+      height={150}
+      label={'Job history unavailable at the moment'}
+    />
+  </View>
+);
+
 // project item - for the flatlist
 const ProjectItem = ({onItemClick, item}) => {
+  const [isReady, setReady] = useState(false);
+
   const task_state_color = task_state => {
     switch (task_state) {
       case 'ONGOING':
@@ -42,7 +69,16 @@ const ProjectItem = ({onItemClick, item}) => {
     }
   };
 
-  return (
+  // run on the initial screen render
+  useEffect(() => {
+    InteractionManager.runAfterInteractions(() => {
+      setReady(true);
+    });
+  }, []);
+
+  return !isReady ? (
+    <ActivityIndicator color={COLORS.secondary} size={SIZES.padding_32} />
+  ) : (
     <TouchableOpacity
       activeOpacity={0.9}
       style={[styles._item_card, {borderLeftColor: COLORS.secondary}]}
@@ -70,7 +106,7 @@ const ProjectItem = ({onItemClick, item}) => {
 /**
  * =================== Main Component =================
  */
-const Projects = ({tasks, user_data, onItemClick}) => {
+const ProjectsView = ({tasks, navigation}) => {
   const {jobs, posted_jobs} = tasks;
   //set project variables
   const [load, setLoading] = useState(false);
@@ -87,15 +123,17 @@ const Projects = ({tasks, user_data, onItemClick}) => {
     }
   }
 
-  useEffect(() => {
-    loadProjects();
-  }, []);
+  // useEffect(() => {
+  //   loadProjects();
+  // }, []);
   return (
     <View style={styles.container}>
       <View style={styles._content_wrapper}>
         <ProjectItem
           item={'some item'}
-          onItemClick={item => onItemClick(item)}
+          onItemClick={item =>
+            navigation.navigate(screens.project_info, {item})
+          }
         />
       </View>
     </View>
@@ -125,5 +163,7 @@ const styles = StyleSheet.create({
     marginTop: SIZES.padding_12,
   },
 });
+
+const Projects = memo(ProjectsView);
 
 export default connect(mapStateToProps)(Projects);
