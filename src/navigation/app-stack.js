@@ -12,6 +12,7 @@ import {
   LocationPicker,
   ProjectInfo,
   RateClient,
+  ConversationScreen,
 } from '../screens';
 import {screens} from '../constants/screens';
 //navigation components
@@ -92,6 +93,10 @@ const AppDrawerNavigator = () => {
       <Stack.Screen name={screens.location_picker} component={LocationPicker} />
       <Stack.Screen name={screens.rate_client} component={RateClient} />
       <Stack.Screen name={screens.project_info} component={ProjectInfo} />
+      <Stack.Screen
+        name={screens.conversation}
+        component={ConversationScreen}
+      />
     </Stack.Navigator>
   );
 };

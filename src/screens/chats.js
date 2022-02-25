@@ -13,6 +13,7 @@ import {useDispatch} from 'react-redux';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 import {Divider} from 'react-native-paper';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {screens} from '../constants';
 
 const mapStateToProps = state => {
   const {user_data} = state;
@@ -93,7 +94,7 @@ const ChatList = ({user_data, navigation}) => {
       </View>
       {/* ========== END OF HEADER AREA SECTION ======== */}
       <View style={[styles._content_container]}>
-        <ChatItem onItemClick={item => console.log('clicked')} />
+        <ChatItem onItemClick={item => navigation.push(screens.conversation)} />
       </View>
     </View>
   );

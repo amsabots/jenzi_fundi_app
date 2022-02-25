@@ -11,6 +11,7 @@ import MainActivity from './main-activity';
 import LocationPicker from './location-picker';
 import RateClient from './rate-client';
 import ProjectInfo from './project-info';
+import ConversationScreen from './conversation';
 
 export {
   HomeView,
@@ -26,4 +27,5 @@ export {
   LocationPicker,
   ProjectInfo,
   RateClient,
+  ConversationScreen,
 };
