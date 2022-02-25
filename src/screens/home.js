@@ -1,14 +1,6 @@
 import React, {useEffect, useState, useCallback, useMemo, useRef} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
-import {
-  View,
-  StyleSheet,
-  BackHandler,
-  ToastAndroid,
-  Text,
-  InteractionManager,
-  ActivityIndicator,
-} from 'react-native';
+import {View, StyleSheet, BackHandler, ToastAndroid, Text} from 'react-native';
 
 //bottom sheet
 
@@ -87,7 +79,11 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
       const {data} = res.data;
       if (data.length) dispatch(task_actions.load_jobs(data));
     } catch (error) {
-      errorMessage(error);
+      ToastAndroid.showWithGravity(
+        'Serivice unavailable',
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+      );
     } finally {
       setLoad(false);
     }
