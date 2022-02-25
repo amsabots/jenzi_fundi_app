@@ -78,9 +78,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderTopLeftRadius: 0,
   },
+  _bubble_from_text: {
+    color: COLORS.white,
+  },
   _bubble_to: {
     backgroundColor: COLORS.secondary,
     borderBottomRightRadius: 0,
+  },
+  _bubble_to_text: {
+    color: COLORS.white,
   },
 });
 
