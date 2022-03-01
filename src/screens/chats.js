@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
 //ui components
@@ -12,8 +12,11 @@ import IoIcons from 'react-native-vector-icons/Ionicons';
 import {connect, useDispatch} from 'react-redux';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 import {Divider} from 'react-native-paper';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import {screens} from '../constants';
+import moment from 'moment';
+import axios from 'axios';
+import {endpoints} from '../endpoints';
 
 const mapStateToProps = state => {
   const {user_data, chats} = state;
@@ -30,7 +33,7 @@ export const ChatItemFooter = ({time, status}) => {
           color={COLORS.secondary}
         />
         <Text style={{...FONTS.caption, marginLeft: SIZES.base}}>
-          a minute ago
+          {moment(time).fromNow()}
         </Text>
       </View>
       {/* =========== MESSSAGE STATUS ============== */}
@@ -49,6 +52,14 @@ export const ChatItemFooter = ({time, status}) => {
 };
 
 const ChatItem = ({item, onItemClick}) => {
+  const {connection, lastMessage} = item;
+  const [partyB_name, setPartyBName] = useState('Identifying....');
+  console.log(connection);
+  useEffect(() => {
+    axios.get(`${endpoints.client_service}/clients/${item.}`).then(res=>{
+      setPartyBName(res.data.name)
+    }).catch(err=>setPartyBName("Name not found"))
+  }, []);
   return (
     <TouchableOpacity
       style={styles._chat_item_container}
@@ -58,19 +69,27 @@ const ChatItem = ({item, onItemClick}) => {
         <CircularImage size={SIZES.size_48} />
       </View>
       <View style={styles._chat_item_text_area}>
-        <Text style={{...FONTS.body_bold}}>Client name</Text>
-        <Text>Lorem ipsum dolo rlorem dsd ewew dsdsd dsdsdsds ds dsd dssd</Text>
-        <ChatItemFooter />
+        <Text style={{...FONTS.body_bold}}>{partyB_name}</Text>
+        <Text>{lastMessage.message}</Text>
+        <ChatItemFooter
+          time={lastMessage.createdAt}
+          status={lastMessage.delivered}
+        />
         <Divider style={styles._divider} />
       </View>
     </TouchableOpacity>
   );
 };
 
+const logger = console.log.bind(console, '[chats.js: CHAT SCREEN]');
+
 const ChatList = ({user_data, navigation, chats}) => {
   const {user} = user_data;
-  console.log(chats);
+  const {chat_rooms} = chats;
+  //event dispatcher hook
   const dispatch = useDispatch();
+
+  //testing area
 
   return (
     <View style={styles.container}>
@@ -96,7 +115,19 @@ const ChatList = ({user_data, navigation, chats}) => {
       </View>
       {/* ========== END OF HEADER AREA SECTION ======== */}
       <View style={[styles._content_container]}>
-        <ChatItem onItemClick={item => navigation.push(screens.conversation)} />
+        {/* */}
+        <FlatList
+          data={chat_rooms}
+          showsVerticalScrollIndicator={false}
+          renderItem={({item}) => {
+            return (
+              <ChatItem
+                onItemClick={item => navigation.push(screens.conversation)}
+                item={item}
+              />
+            );
+          }}
+        />
       </View>
     </View>
   );
@@ -129,6 +160,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: SIZES.base,
+    width: '100%',
   },
   _divider: {
     marginTop: SIZES.base,
