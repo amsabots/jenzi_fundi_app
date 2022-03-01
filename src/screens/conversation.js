@@ -11,7 +11,7 @@ import {chat_actions} from '../store-actions';
 import IoIcons from 'react-native-vector-icons/Ionicons';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 import axios from 'axios';
-import {endpoints} from '../endpoints';
+import {endpoints, firebase_reference} from '../endpoints';
 import {user_data} from '../../store/user';
 import {TextInput} from 'react-native-paper';
 
@@ -55,11 +55,12 @@ const TopHeader = ({nav}) => {
   );
 };
 
-const ConversationScreen = ({navigation, chats, route}) => {
+const ConversationScreen = ({navigation, chats, route, user_data}) => {
   //get passed parameters from the previous screen
   const {i} = route.params;
   const {chatRoomId, partyB} = i.connection;
   const {chats: conversations, pager} = chats;
+  const {user} = user_data;
   //  screen/componet state
   const [refreshing, setRefreshing] = useState(false);
 
@@ -67,7 +68,11 @@ const ConversationScreen = ({navigation, chats, route}) => {
   const dispatch = useDispatch();
 
   const handleSubmitMessage = () => {
-    ToastAndroid.show('sent', ToastAndroid.SHORT);
+    firebase_reference
+      .ref(`/chats/${user.accountId}`)
+      .set({name: 'andrew'})
+      .then(res => `message sent`)
+      .catch(er => console.log(er));
   };
 
   useFocusEffect(

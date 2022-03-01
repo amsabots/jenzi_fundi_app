@@ -102,22 +102,6 @@ const ProjectsView = ({tasks, navigation}) => {
   //redux
   const dispatch = useDispatch();
   //render project item
-
-  async function loadProjects() {
-    setLoading(true);
-    try {
-    } catch (error) {
-      setLoading(false);
-      errorMessage(error);
-    }
-  }
-
-  useEffect(() => {
-    loadProjects();
-    return () => {
-      setLoading(false);
-    };
-  }, []);
   return (
     <View style={styles.container}>
       <View style={styles._content_wrapper}>
