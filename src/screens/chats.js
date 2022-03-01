@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
 //ui components
-import {CircularImage, MapMarker} from '../components';
+import {CircularImage, LoadingNothing, MapMarker} from '../components';
 
 //Icons
 import EvilCons from 'react-native-vector-icons/EvilIcons';
@@ -26,27 +26,38 @@ const mapStateToProps = state => {
 export const ChatItemFooter = ({time, status}) => {
   return (
     <View style={styles._footer_item}>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
         <EvilCons
           name="clock"
           size={SIZES.icon_size}
           color={COLORS.secondary}
         />
-        <Text style={{...FONTS.caption, marginLeft: SIZES.base}}>
+        <Text
+          style={{
+            ...FONTS.caption,
+            marginLeft: SIZES.base,
+          }}>
           {moment(time).fromNow()}
         </Text>
       </View>
       {/* =========== MESSSAGE STATUS ============== */}
-      <IoIcons
-        name="checkmark"
-        size={SIZES.icon_size}
-        color={COLORS.secondary}
-      />
-      {/* <IoIcons
-            name="checkmark-done"
-            size={SIZES.icon_size}
-            color={COLORS.secondary}
-          /> */}
+      {!status ? (
+        <IoIcons
+          name="checkmark"
+          size={SIZES.icon_size}
+          color={COLORS.secondary}
+        />
+      ) : (
+        <IoIcons
+          name="checkmark-done"
+          size={SIZES.icon_size}
+          color={COLORS.secondary}
+        />
+      )}
     </View>
   );
 };
@@ -54,11 +65,16 @@ export const ChatItemFooter = ({time, status}) => {
 const ChatItem = ({item, onItemClick}) => {
   const {connection, lastMessage} = item;
   const [partyB_name, setPartyBName] = useState('Identifying....');
-  console.log(connection);
   useEffect(() => {
-    axios.get(`${endpoints.client_service}/clients/${item.}`).then(res=>{
-      setPartyBName(res.data.name)
-    }).catch(err=>setPartyBName("Name not found"))
+    axios
+      .get(`${endpoints.client_service}/clients/${connection.partyB}`)
+      .then(res => {
+        setPartyBName(res.data.name);
+      })
+      .catch(err => {
+        console.log(err);
+        setPartyBName('Name not found');
+      });
   }, []);
   return (
     <TouchableOpacity
@@ -116,18 +132,30 @@ const ChatList = ({user_data, navigation, chats}) => {
       {/* ========== END OF HEADER AREA SECTION ======== */}
       <View style={[styles._content_container]}>
         {/* */}
-        <FlatList
-          data={chat_rooms}
-          showsVerticalScrollIndicator={false}
-          renderItem={({item}) => {
-            return (
-              <ChatItem
-                onItemClick={item => navigation.push(screens.conversation)}
-                item={item}
-              />
-            );
-          }}
-        />
+        {chat_rooms.length ? (
+          <FlatList
+            data={chat_rooms}
+            showsVerticalScrollIndicator={false}
+            renderItem={({item}) => {
+              return (
+                <ChatItem
+                  onItemClick={item => navigation.push(screens.conversation)}
+                  item={item}
+                />
+              );
+            }}
+          />
+        ) : (
+          <View
+            style={{
+              justifyContent: 'center',
+              height: '100%',
+            }}>
+            <LoadingNothing
+              label={`You have no available chats. All your chat history and conversation data will appear here`}
+            />
+          </View>
+        )}
       </View>
     </View>
   );
@@ -148,6 +176,7 @@ const styles = StyleSheet.create({
   // content container
   _content_container: {
     paddingHorizontal: SIZES.base,
+    paddingTop: SIZES.base,
   },
   _chat_item_container: {
     flexDirection: 'row',
@@ -155,12 +184,12 @@ const styles = StyleSheet.create({
   _chat_item_text_area: {
     marginLeft: SIZES.padding_12,
     marginRight: SIZES.padding_16,
+    width: '100%',
   },
   _footer_item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: SIZES.base,
-    width: '100%',
   },
   _divider: {
     marginTop: SIZES.base,
