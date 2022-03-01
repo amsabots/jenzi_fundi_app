@@ -114,6 +114,9 @@ const ProjectsView = ({tasks, navigation}) => {
 
   useEffect(() => {
     loadProjects();
+    return () => {
+      setLoading(false);
+    };
   }, []);
   return (
     <View style={styles.container}>

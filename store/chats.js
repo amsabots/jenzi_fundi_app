@@ -14,9 +14,13 @@ export const chats = (state = initialState, action) => {
     case 'ACTIVE_CHAT':
       return {...state, selected_chat: payload};
     case 'UPDATE_PAGE':
-      return {...state, pager: {payload}};
+      return {...state, pager: {...payload}};
     case 'LOAD_CHAT_ROOMS':
       return {...state, chat_rooms: payload};
+    case 'LOAD_NEW_CHATS':
+      return {...state, chats: payload};
+    case 'lOAD_MORE_CHATS':
+      return {...state, chats: [...state.chats, ...payload]};
     default:
       return state;
   }

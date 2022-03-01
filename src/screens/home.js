@@ -152,12 +152,24 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
       </View>
       <View style={styles._account_status_banner}>
         <Text style={styles._account_status_banner_text}>
-          You account profile is public
+          Your account profile is public
         </Text>
       </View>
       {/* ============ CONTENT AREA ================= */}
       <View style={styles.content}>
-        {load ? LoaderView : <Projects navigation={navigation} />}
+        {load ? (
+          LoaderView
+        ) : jobs.length ? (
+          <Projects navigation={navigation} />
+        ) : (
+          <View style={{justifyContent: 'center', flex: 1}}>
+            <LoadingNothing
+              label={
+                'No history available. All your projects will appear here. The section shown below will be used to display incoming project request alerts'
+              }
+            />
+          </View>
+        )}
       </View>
       <ProjectAlert />
     </View>
@@ -184,6 +196,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingTop: SIZES.padding_12,
+    paddingHorizontal: SIZES.padding_16,
   },
   _listen_projects_container: {
     justifyContent: 'center',

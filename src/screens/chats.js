@@ -23,7 +23,7 @@ const mapStateToProps = state => {
   return {user_data, chats};
 };
 
-export const ChatItemFooter = ({time, status}) => {
+export const ChatItemFooter = ({time, status, belongs_to_user}) => {
   return (
     <View style={styles._footer_item}>
       <View
@@ -31,11 +31,21 @@ export const ChatItemFooter = ({time, status}) => {
           flexDirection: 'row',
           alignItems: 'center',
         }}>
-        <EvilCons
-          name="clock"
-          size={SIZES.icon_size}
-          color={COLORS.secondary}
-        />
+        {belongs_to_user ? (
+          !status ? (
+            <IoIcons
+              name="checkmark"
+              size={SIZES.icon_size}
+              color={COLORS.secondary}
+            />
+          ) : (
+            <IoIcons
+              name="checkmark-done"
+              size={SIZES.icon_size}
+              color={COLORS.secondary}
+            />
+          )
+        ) : null}
         <Text
           style={{
             ...FONTS.caption,
@@ -45,26 +55,17 @@ export const ChatItemFooter = ({time, status}) => {
         </Text>
       </View>
       {/* =========== MESSSAGE STATUS ============== */}
-      {!status ? (
-        <IoIcons
-          name="checkmark"
-          size={SIZES.icon_size}
-          color={COLORS.secondary}
-        />
-      ) : (
-        <IoIcons
-          name="checkmark-done"
-          size={SIZES.icon_size}
-          color={COLORS.secondary}
-        />
-      )}
     </View>
   );
 };
 
-const ChatItem = ({item, onItemClick}) => {
+const ChatItem = ({item, onItemClick, user}) => {
   const {connection, lastMessage} = item;
   const [partyB_name, setPartyBName] = useState('Identifying....');
+  const is_belong_to_logged_user = () => {
+    if (user.id === lastMessage.sourceId) return true;
+    return false;
+  };
   useEffect(() => {
     axios
       .get(`${endpoints.client_service}/clients/${connection.partyB}`)
@@ -90,6 +91,7 @@ const ChatItem = ({item, onItemClick}) => {
         <ChatItemFooter
           time={lastMessage.createdAt}
           status={lastMessage.delivered}
+          belongs_to_user={is_belong_to_logged_user()}
         />
         <Divider style={styles._divider} />
       </View>
@@ -139,8 +141,11 @@ const ChatList = ({user_data, navigation, chats}) => {
             renderItem={({item}) => {
               return (
                 <ChatItem
-                  onItemClick={item => navigation.push(screens.conversation)}
+                  onItemClick={i =>
+                    navigation.navigate(screens.conversation, {i})
+                  }
                   item={item}
+                  user={user}
                 />
               );
             }}
