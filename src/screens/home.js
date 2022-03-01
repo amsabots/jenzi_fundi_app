@@ -6,7 +6,7 @@ import {View, StyleSheet, BackHandler, ToastAndroid, Text} from 'react-native';
 
 // redux store
 import {useDispatch, connect} from 'react-redux';
-import {task_actions, UISettingsActions} from '../store-actions';
+import {chat_actions, task_actions, UISettingsActions} from '../store-actions';
 
 //components
 import {COLORS, FONTS, SIZES} from '../constants/themes';
@@ -23,6 +23,9 @@ import {Projects} from '.';
 import {LoaderSpinner, LoadingNothing} from '../components';
 import {endpoints, errorMessage} from '../endpoints';
 import axios from 'axios';
+import {chats_functions} from '../async-actions';
+
+const logger = console.log.bind(console, '[home.js: Home screen] ');
 
 const mapStateToProps = state => {
   const {user_data, clientsData, tasks} = state;
@@ -89,12 +92,21 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
     }
   };
 
+  const run_async_operations = () => {
+    logger(`[info: running all async operations]`);
+    chats_functions
+      .load_chat_rooms(user.id)
+      .then(res => dispatch(chat_actions.load_chat_rooms(res)));
+  };
+
   //run on the first screen render
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', backButtonHandler);
     //connect to pusher channel
     subscribe_to_instances();
     load_jobs();
+    // run all events/action with non attachable UI context i.e they do not care about current UI state
+    run_async_operations();
     return () => {
       setLoad(false);
     };

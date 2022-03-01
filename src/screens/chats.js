@@ -9,15 +9,15 @@ import EvilCons from 'react-native-vector-icons/EvilIcons';
 import IoIcons from 'react-native-vector-icons/Ionicons';
 
 // dispatch
-import {useDispatch} from 'react-redux';
+import {connect, useDispatch} from 'react-redux';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 import {Divider} from 'react-native-paper';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {screens} from '../constants';
 
 const mapStateToProps = state => {
-  const {user_data} = state;
-  return {user};
+  const {user_data, chats} = state;
+  return {user_data, chats};
 };
 
 export const ChatItemFooter = ({time, status}) => {
@@ -67,7 +67,9 @@ const ChatItem = ({item, onItemClick}) => {
   );
 };
 
-const ChatList = ({user_data, navigation}) => {
+const ChatList = ({user_data, navigation, chats}) => {
+  const {user} = user_data;
+  console.log(chats);
   const dispatch = useDispatch();
 
   return (
@@ -81,7 +83,7 @@ const ChatList = ({user_data, navigation}) => {
           onPress={() => navigation.openDrawer()}
         />
         <Text style={{...FONTS.body1, color: COLORS.secondary}}>
-          UI Manager
+          Chats {'&'} Conversations
         </Text>
         <View>
           <EvilCons
@@ -134,4 +136,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatList;
+export default connect(mapStateToProps)(ChatList);

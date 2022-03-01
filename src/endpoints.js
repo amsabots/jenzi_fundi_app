@@ -1,8 +1,8 @@
 import Toast from 'react-native-toast-message';
 export const endpoints = {
-  notification_server: 'http://18.217.178.254:27500/realtime-server',
-  client_service: `http://18.217.178.254:27900/client/api`,
-  fundi_service: `http://18.217.178.254:27800/fundi/api`,
+  notification_server: 'http://159.223.37.196:27500/realtime-server',
+  client_service: `http://159.223.37.196:27900/client/api`,
+  fundi_service: `http://159.223.37.196:27800/fundi/api`,
 };
 
 export const errorMessage = err => {
