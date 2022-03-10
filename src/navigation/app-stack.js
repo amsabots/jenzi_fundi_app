@@ -51,6 +51,15 @@ const DrawerNavigator = () => {
         }}
       />
       <Drawer.Screen
+        name={screens.projects}
+        component={Projects}
+        options={{
+          drawerIcon: ({color}) => (
+            <F5 name="tasks" size={SIZES.icon_size_focused} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name={screens.chats_screen}
         component={ChatScreen}
         options={{

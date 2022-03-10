@@ -19,11 +19,7 @@ import {screens} from '../constants';
 import EvilCons from 'react-native-vector-icons/EvilIcons';
 import IoIcons from 'react-native-vector-icons/Ionicons';
 import ProjectAlert from './sub-components/project-info';
-import {Projects} from '.';
 import {LoaderSpinner, LoadingNothing} from '../components';
-import {endpoints, errorMessage} from '../endpoints';
-import axios from 'axios';
-import {chats_functions} from '../async-actions';
 
 const logger = console.log.bind(console, '[home.js: Home screen] ');
 
@@ -40,7 +36,7 @@ export const LoaderView = (
 );
 
 const Home = ({navigation, user_data, clientsData, tasks}) => {
-  const {jobs, selected_job} = tasks;
+  const {selected_job} = tasks;
   const {user} = user_data;
   // component state variables
   const [load, setLoad] = useState(false);
@@ -57,7 +53,6 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
     } else {
       BackHandler.exitApp();
     }
-
     // timeout for fade and exit
     setTimeout(() => {
       backHandlerClickCount = 0;
@@ -72,41 +67,11 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
 
   const dispatch = useDispatch();
 
-  const load_jobs = async () => {
-    try {
-      setLoad(true);
-      const res = await axios.get(
-        `${endpoints.fundi_service}/projects/${user.id}?page=0&pageSize=20`,
-        {timeout: 7000},
-      );
-      const {data} = res.data;
-      if (data.length) dispatch(task_actions.load_jobs(data));
-    } catch (error) {
-      ToastAndroid.showWithGravity(
-        'Serivice unavailable',
-        ToastAndroid.SHORT,
-        ToastAndroid.TOP,
-      );
-    } finally {
-      setLoad(false);
-    }
-  };
-
-  const run_async_operations = () => {
-    logger(`[info: running all async operations]`);
-    chats_functions
-      .load_chat_rooms(user.id)
-      .then(res => dispatch(chat_actions.load_chat_rooms(res)));
-  };
-
   //run on the first screen render
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', backButtonHandler);
     //connect to pusher channel
     subscribe_to_instances();
-    load_jobs();
-    // run all events/action with non attachable UI context i.e they do not care about current UI state
-    run_async_operations();
     return () => {
       setLoad(false);
     };
@@ -156,21 +121,7 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
         </Text>
       </View>
       {/* ============ CONTENT AREA ================= */}
-      <View style={styles.content}>
-        {load ? (
-          LoaderView
-        ) : jobs.length ? (
-          <Projects navigation={navigation} />
-        ) : (
-          <View style={{justifyContent: 'center', flex: 1}}>
-            <LoadingNothing
-              label={
-                'No history available. All your projects will appear here. The section shown below will be used to display incoming project request alerts'
-              }
-            />
-          </View>
-        )}
-      </View>
+      <View style={styles.content}></View>
       <ProjectAlert />
     </View>
   );

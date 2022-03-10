@@ -26,6 +26,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 
 //ui subcomponets
 import ProjectCancelOrDispute from './sub-components/task-action-reposnder';
+import moment from 'moment';
 
 const mapStateToProps = state => {
   const {user_data} = state;
@@ -53,6 +54,9 @@ const ProjectInfo = ({navigation, user_data, route}) => {
   const sheetRef = useRef();
 
   const {item} = route.params;
+  const {item: obj, taskDetails} = item;
+
+  console.log(taskDetails);
 
   const handleSheetOpenRequest = type => {
     setSheetActionType(type);
@@ -91,7 +95,7 @@ const ProjectInfo = ({navigation, user_data, route}) => {
         />
         {/* ===========   PAGE CLIENT DETAILS ============= */}
 
-        <ClientDetails />
+        <ClientDetails client_details={taskDetails.client} />
         {/*  ========== PAGE PROJECT INFO ================= */}
         <Text
           style={{
@@ -108,14 +112,15 @@ const ProjectInfo = ({navigation, user_data, route}) => {
             visible={true}
             contentStyle={{backgroundColor: COLORS.light_secondary}}>
             <Text style={{color: COLORS.secondary, ...FONTS.caption}}>
-              Any special information about the project will appear here
+              {obj?.message ||
+                ' Any special information about the project will appear here - Keep note'}
             </Text>
           </Banner>
           {/* ============== TITLE AND BLA BLAS ================== */}
           <View style={{marginTop: SIZES.padding_16}}>
             <SectionTitle label=" Project title:" />
-            <Text style={{color: COLORS.secondary, ...FONTS.body}}>
-              Project two
+            <Text style={{color: COLORS.secondary, ...FONTS.body_medium}}>
+              {taskDetails.title}
             </Text>
             <Divider style={{marginVertical: SIZES.padding_12}} />
             {/* ======= REQUIREMENTS AND SHIT ============== */}
@@ -132,8 +137,19 @@ const ProjectInfo = ({navigation, user_data, route}) => {
             {/* ========== TASK STATE AND TIMELINE =========== */}
             <SectionTitle label="Extra info:" />
             <View style={styles._extra_info}>
-              <InfoChips text={'On going'} textColor={COLORS.secondary} />
-              <Text>Posted: 3 mins ago</Text>
+              <InfoChips
+                text={obj.projectStatus}
+                textColor={obj.foregroundIdColor}
+              />
+              <View style={{marginHorizontal: SIZES.padding_4}}>
+                <InfoChips
+                  text={`Client - ${taskDetails.taskState}`}
+                  textColor={obj.backgroundIdColor}
+                />
+              </View>
+              <Text style={{...FONTS.caption}}>
+                Posted: {moment(obj.createdAt).fromNow()}
+              </Text>
             </View>
             {/* ============= ACTIONS - BUTTONS AND SHIT ========== */}
             <Divider style={{marginVertical: SIZES.padding_12}} />
@@ -221,6 +237,7 @@ const styles = StyleSheet.create({
     marginVertical: SIZES.base,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   _action_btn: {
     flexDirection: 'row',

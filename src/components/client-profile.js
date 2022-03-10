@@ -5,6 +5,7 @@ import {LoaderSpinner, CircularImage} from '.';
 import {Rating} from 'react-native-ratings';
 import {Reviews} from '.';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import moment from 'moment';
 
 const ClientDetails = ({client_details, loadClient = false}) => {
   const btmSheetRef = useRef(null);
@@ -22,16 +23,18 @@ const ClientDetails = ({client_details, loadClient = false}) => {
           <>
             <CircularImage size={120} />
             <View style={styles._text_info}>
-              <Text style={{...FONTS.body_medium}}>Client name</Text>
+              <Text style={{...FONTS.body_medium}}>{client_details?.name}</Text>
               <Text
                 style={{
                   ...FONTS.caption,
                   marginVertical: SIZES.base,
                   color: COLORS.secondary,
                 }}>
-                Company name
+                {client_details?.company || 'Not available'}
               </Text>
-              <Text style={{...FONTS.body}}>Member for: 7 months</Text>
+              <Text style={{...FONTS.body}}>
+                Member for: {moment(client_details.createdAt).fromNow(true)}
+              </Text>
               {/* ==== rating section =========== */}
               <View style={styles._rating_section}>
                 <Rating
@@ -39,7 +42,7 @@ const ClientDetails = ({client_details, loadClient = false}) => {
                   ratingCount={5}
                   imageSize={SIZES.padding_32}
                   ratingColor={COLORS.secondary}
-                  startingValue={3}
+                  startingValue={0}
                   readonly={true}
                 />
                 {/* ===== stars  */}
@@ -51,7 +54,7 @@ const ClientDetails = ({client_details, loadClient = false}) => {
                       0 reviews
                     </Text>
                   </TouchableOpacity>
-                  <Text style={[styles._txt_sec]}>3 stars</Text>
+                  <Text style={[styles._txt_sec]}>0 stars</Text>
                 </View>
               </View>
             </View>

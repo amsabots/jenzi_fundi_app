@@ -1,27 +1,17 @@
-import React, {
-  useEffect,
-  useRef,
-  useCallback,
-  useState,
-  useMemo,
-  memo,
-} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  InteractionManager,
-  ActivityIndicator,
+  FlatList,
+  ScrollView,
+  ToastAndroid,
 } from 'react-native';
 // redux store
 import {UISettingsActions} from '../store-actions/ui-settings';
 import {connect, useDispatch} from 'react-redux';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
-
-//
-import {FlatList} from 'react-native-gesture-handler';
-
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
 //ui components
@@ -38,6 +28,7 @@ import axios from 'axios';
 import {endpoints, errorMessage} from '../endpoints';
 import {task_actions} from '../store-actions/task-actions';
 import {screens} from '../constants';
+import moment from 'moment';
 
 //
 
@@ -49,9 +40,34 @@ export const NothingToShow = (
     />
   </View>
 );
+const LoaderView = (
+  <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+    <LoaderSpinner.ArcherLoader size={180} loading={true} />
+    <Text>Fetching projects......</Text>
+  </View>
+);
 
 // project item - for the flatlist
 const ProjectItem = ({onItemClick, item}) => {
+  const {
+    taskId,
+    createdAt,
+    projectStatus,
+    foregroundIdColor,
+    backgroundIdColor,
+  } = item;
+  const [taskDetails, setTaskDetails] = useState({});
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get(`${endpoints.client_service}/jobs/${taskId}`)
+      .then(res => {
+        setTaskDetails(res.data);
+      })
+      .catch(er => setTaskDetails(null))
+      .finally(() => setLoading(false));
+  }, []);
   const task_state_color = task_state => {
     switch (task_state) {
       case 'ONGOING':
@@ -66,26 +82,43 @@ const ProjectItem = ({onItemClick, item}) => {
         return COLORS.primary;
     }
   };
-
   return (
     <TouchableOpacity
       activeOpacity={0.9}
-      style={[styles._item_card, {borderLeftColor: COLORS.secondary}]}
-      onPress={() => onItemClick(item)}>
-      <InfoChips text={'ON GOING'} textColor={COLORS.secondary} />
+      style={[styles._item_card, {borderLeftColor: foregroundIdColor}]}
+      onPress={() => onItemClick({item, taskDetails})}>
+      <View style={styles._project_state}>
+        <View>
+          <Text style={{...FONTS.caption, marginBottom: 4}}>
+            Your project status
+          </Text>
+          <InfoChips text={projectStatus} textColor={COLORS.secondary} />
+        </View>
+        {/* ======== left fundi state */}
+        <View>
+          <Text style={{...FONTS.caption, marginBottom: 4}}>
+            Client side state
+          </Text>
+          <InfoChips text={taskDetails.taskState} textColor={COLORS.primary} />
+        </View>
+      </View>
+      {/* =========== END OF PROJECT STATE ======== */}
       <Text style={{...FONTS.body_bold, marginTop: SIZES.base}}>
-        Project title
+        {taskDetails.title || 'Not Available'}
       </Text>
       <View style={styles._card_timeline}>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <IonIcons name="time-outline" size={SIZES.padding_16} />
           <Text style={{...FONTS.caption, marginLeft: SIZES.base}}>
-            3 days ago
+            {moment(createdAt).fromNow(false)}
           </Text>
         </View>
         {/* ==== */}
         <View>
           <CircularImage size={24} />
+          <Text style={{...FONTS.captionBold, color: backgroundIdColor}}>
+            {taskDetails?.client?.name}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -95,21 +128,61 @@ const ProjectItem = ({onItemClick, item}) => {
 /**
  * =================== Main Component =================
  */
-const ProjectsView = ({tasks, navigation}) => {
+const Projects = ({tasks, navigation, user_data}) => {
   const {jobs, posted_jobs} = tasks;
+  const {user} = user_data;
   //set project variables
-  const [load, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   //redux
   const dispatch = useDispatch();
   //render project item
+  const load_jobs = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${endpoints.fundi_service}/projects/${user.id}?page=0&pageSize=20`,
+        {timeout: 7000},
+      );
+      const {data} = res.data;
+      if (data.length) dispatch(task_actions.load_jobs(data));
+    } catch (error) {
+      ToastAndroid.showWithGravity(
+        'Serivice unavailable',
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load_jobs();
+  }, []);
+
+  if (loading) return LoaderView;
+  if (!jobs.length) return NothingToShow;
+
   return (
     <View style={styles.container}>
+      <DefaultToolBar title="Project Listing" navigation={navigation} />
       <View style={styles._content_wrapper}>
-        <ProjectItem
-          item={'some item'}
-          onItemClick={item =>
-            navigation.navigate(screens.project_info, {item})
-          }
+        <FlatList
+          data={jobs}
+          showsVerticalScrollIndicator={false}
+          refreshing={loading}
+          onRefresh={() => load_jobs()}
+          keyExtractor={({item, idx}) => idx}
+          renderItem={({item}) => {
+            return (
+              <ProjectItem
+                item={item}
+                onItemClick={item =>
+                  navigation.navigate(screens.project_info, {item})
+                }
+              />
+            );
+          }}
         />
       </View>
     </View>
@@ -133,13 +206,20 @@ const styles = StyleSheet.create({
     borderLeftWidth: SIZES.base,
     padding: SIZES.padding_16,
   },
+  _content_wrapper: {
+    flex: 1,
+    paddingHorizontal: SIZES.base,
+    paddingTop: SIZES.base,
+  },
   _card_timeline: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: SIZES.padding_12,
   },
+  _project_state: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
 });
-
-const Projects = memo(ProjectsView);
 
 export default connect(mapStateToProps)(Projects);
