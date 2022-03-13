@@ -1,4 +1,4 @@
-import React, {useMemo, useState, useRef} from 'react';
+import React, {useMemo, useState, useCallback} from 'react';
 import BottomSheet from '@gorhom/bottom-sheet';
 import {TouchableOpacity, Text, StyleSheet, View} from 'react-native';
 //reactive native paper
@@ -38,9 +38,14 @@ const ImageSelector = ({
   buttonLabel = 'Submit',
   pickerLabel = 'Pick file',
   clearImages,
+  onRequestClose,
 }) => {
   const snapPoints = useMemo(() => [0, '20%', '60%', '90%'], []);
   const [images, setImages] = useState([]);
+
+  const handleSheetChanges = useCallback(index => {
+    if (!index) setImages([]);
+  }, []);
 
   // component functions
   const handleImagePicker = async () => {
@@ -49,6 +54,7 @@ const ImageSelector = ({
       const r = await DocumentPicker.pickSingle({
         presentationStyle: 'fullScreen',
         copyTo: 'cachesDirectory',
+        type: DocumentPicker.types.images,
       });
       setImages([r]);
     } else {
@@ -62,8 +68,25 @@ const ImageSelector = ({
   };
 
   return (
-    <BottomSheet ref={sheetRef} initialSnapIndex={0} snapPoints={snapPoints}>
+    <BottomSheet
+      ref={sheetRef}
+      initialSnapIndex={0}
+      snapPoints={snapPoints}
+      onChange={handleSheetChanges}>
       <View style={styles.container}>
+        <View
+          style={{
+            marginVertical: SIZES.padding_12,
+            alignItems: 'flex-end',
+            paddingHorizontal: SIZES.padding_16,
+          }}>
+          <AD
+            name="close"
+            color={COLORS.secondary}
+            size={SIZES.icon_size_focused}
+            onPress={onRequestClose}
+          />
+        </View>
         <TouchableOpacity
           style={styles._upload_container}
           onPress={() => {

@@ -15,6 +15,7 @@ const delay = (duration = 3000) => {
 const offline_data = {
   user: '@user',
   project_notification: '@project_notification',
+  current_project_user: `@current_user`,
 };
 
 const pusher_filters = {

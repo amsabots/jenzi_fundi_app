@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useCallback, useMemo, useRef} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {View, StyleSheet, BackHandler, ToastAndroid, Text} from 'react-native';
+import {popPushNotification} from '../notifications';
 
 //bottom sheet
 
@@ -20,6 +21,7 @@ import EvilCons from 'react-native-vector-icons/EvilIcons';
 import IoIcons from 'react-native-vector-icons/Ionicons';
 import ProjectAlert from './sub-components/project-info';
 import {LoaderSpinner, LoadingNothing} from '../components';
+import {debounce} from '../config';
 
 const logger = console.log.bind(console, '[home.js: Home screen] ');
 
@@ -38,6 +40,7 @@ export const LoaderView = (
 const Home = ({navigation, user_data, clientsData, tasks}) => {
   const {selected_job} = tasks;
   const {user} = user_data;
+
   // component state variables
   const [load, setLoad] = useState(false);
 
@@ -61,17 +64,11 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
     return true;
   };
 
-  const subscribe_to_instances = useCallback(() => {
-    consume_from_pusher(user_data.user.accountId);
-  }, []);
-
   const dispatch = useDispatch();
 
   //run on the first screen render
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', backButtonHandler);
-    //connect to pusher channel
-    subscribe_to_instances();
     return () => {
       setLoad(false);
     };

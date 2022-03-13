@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 //
 import SplashScreen from 'react-native-splash-screen';
 
-import {Provider} from 'react-redux';
+import {connect, Provider} from 'react-redux';
 import {createStore} from 'redux';
 //paper react native ui lib
 import {Provider as PaperProvider, DefaultTheme} from 'react-native-paper';
@@ -17,38 +17,39 @@ import {allReducers} from './store';
 export const store = createStore(allReducers);
 
 // ui components
-import {PrimaryStatusBar} from './src/components';
+import {PrimaryStatusBar, SnackView} from './src/components';
 
 //stack screen
 import {NavigationContainerWrapper} from './src/navigation';
-import {screens, theme} from './src/constants';
+import {theme} from './src/constants';
+import {PostActionRunner} from './src/constants/themes';
 
 // app theme - colors and fonts
-const appTheme = {
-  ...DefaultTheme,
-  color: {
-    ...DefaultTheme.colors,
-    primary: theme.COLORS.primary,
-    accent: theme.COLORS.secondary,
-  },
-};
-const delay = duration => {
-  return new Promise(res => setTimeout(res, duration));
-};
 
 const App = () => {
-  React.useEffect(() => {
-    delay(3000).then(e => SplashScreen.hide());
+  const appTheme = {
+    ...DefaultTheme,
+    color: {
+      ...DefaultTheme.colors,
+      primary: theme.COLORS.primary,
+      accent: theme.COLORS.secondary,
+    },
+  };
+
+  useEffect(() => {
+    console.log('running entry point');
   }, []);
   return (
     <>
       <Provider store={store}>
+        <PostActionRunner />
         <PaperProvider theme={appTheme}>
           <MenuProvider>
             <PrimaryStatusBar />
             <NavigationContainerWrapper />
           </MenuProvider>
         </PaperProvider>
+        <SnackView />
       </Provider>
       <Toast />
     </>

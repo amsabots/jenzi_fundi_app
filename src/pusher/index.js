@@ -1,5 +1,4 @@
 import {consumeUserInfo} from './project-ops';
-import {consumerIncomingChats} from './chats-puhser';
 import Pusher from 'pusher-js/react-native';
 import {app_config} from '../config';
 

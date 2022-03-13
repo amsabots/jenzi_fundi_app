@@ -13,6 +13,7 @@ import {MapMarker} from './google-map-fundi-marker';
 import AppRadioBtns from './radio-group';
 import ClientDetails from './client-profile';
 import Reviews from './review-bottom-sheet';
+import SnackView from './snackbar';
 
 export {
   PrimaryStatusBar,
@@ -30,4 +31,5 @@ export {
   AppRadioBtns,
   ClientDetails,
   Reviews,
+  SnackView,
 };

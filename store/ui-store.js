@@ -7,6 +7,7 @@ const state = {
   modalShow: false,
   refresh_state: Math.random(),
   project_banner: {},
+  snack_visible: '',
 };
 
 const UISettings = (s = state, action) => {
@@ -20,6 +21,8 @@ const UISettings = (s = state, action) => {
       return {...s, project_banner: payload};
     case 'HIDE_PROJECT_BANNER':
       return {...s, project_banner: {}};
+    case 'SHOW_SNACKBAR':
+      return {...s, snack_visible: payload};
     default:
       return state;
   }

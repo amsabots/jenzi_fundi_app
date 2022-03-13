@@ -137,6 +137,13 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+
+    // packaging options
+       packagingOptions {
+       resources.excludes.add("META-INF/*")
+   }  
+      
     splits {
         abi {
             reset()

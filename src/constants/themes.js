@@ -1,4 +1,6 @@
 import {Dimensions} from 'react-native';
+import {connect} from 'react-redux';
+import React, {useEffect} from 'react';
 
 const {width, height} = Dimensions.get('window');
 
@@ -91,3 +93,17 @@ export const UTILS = {
   svgPath:
     'M75.2 0v61H0V0c4.1 0 7.4 3.1 7.9 7.1C10 21.7 22.5 33 37.7 33c15.2 0 27.7-11.3 29.7-25.9.5-4 3.9-7.1 7.9-7.1h-.1z',
 };
+
+const mapStateToProps = state => {
+  const {user_data} = state;
+  return {user_data};
+};
+
+const ActionRunner = ({user_data}) => {
+  useEffect(() => {
+    console.log(user_data);
+  }, [user_data.user]);
+  return null;
+};
+
+export const PostActionRunner = connect(mapStateToProps)(ActionRunner);

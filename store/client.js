@@ -4,8 +4,6 @@ const initialState = {
   client_request: {},
   selected_client: {},
   is_task_accepted: false,
-  is_task_rejected: false,
-  is_request_expired: false,
 };
 
 const clientsData = (state = initialState, action) => {
@@ -19,10 +17,8 @@ const clientsData = (state = initialState, action) => {
       return {...state, selected_client: payload};
     case 'SET_ACCEPTED_TASK':
       return {...state, is_task_accepted: payload};
-    case 'SET_REJECTED_TASK':
-      return {...state, is_task_rejected: payload};
-    case 'SET_EXPIRED_TASK':
-      return {...state, is_request_expired: payload};
+    case 'EXPIRE_REQUEST':
+      return initialState;
     default:
       return state;
   }

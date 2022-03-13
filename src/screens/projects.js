@@ -172,7 +172,7 @@ const Projects = ({tasks, navigation, user_data}) => {
           showsVerticalScrollIndicator={false}
           refreshing={loading}
           onRefresh={() => load_jobs()}
-          keyExtractor={({item, idx}) => idx}
+          keyExtractor={item => item.id}
           renderItem={({item}) => {
             return (
               <ProjectItem

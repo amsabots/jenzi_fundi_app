@@ -5,6 +5,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   InteractionManager,
+  ImageBackground,
+  Image,
 } from 'react-native';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 import EnIcon from 'react-native-vector-icons/Entypo';
@@ -15,9 +17,17 @@ import {
   Chip,
   Portal,
   Dialog,
+  Card,
 } from 'react-native-paper';
-
-import {ClientDetails, LoadingNothing, InfoChips} from '../components';
+import storage from '@react-native-firebase/storage';
+import {
+  ClientDetails,
+  LoadingNothing,
+  InfoChips,
+  LoaderSpinner,
+  ImageSelector,
+  LoadingModal,
+} from '../components';
 
 //redux
 import {connect, useDispatch} from 'react-redux';
@@ -27,6 +37,9 @@ import {ScrollView} from 'react-native-gesture-handler';
 //ui subcomponets
 import ProjectCancelOrDispute from './sub-components/task-action-reposnder';
 import moment from 'moment';
+
+//icons
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const mapStateToProps = state => {
   const {user_data} = state;
@@ -51,12 +64,14 @@ const ProjectInfo = ({navigation, user_data, route}) => {
   const [ready, setIsReady] = useState(false);
   const [confirmAction, setConfirmAction] = useState(false);
   const [sheetActionType, setSheetActionType] = useState('');
+  const [images_to_upload, setImagesToUpload] = useState(null);
+
+  // variable and builder components
   const sheetRef = useRef();
+  const image_selector_ref = useRef();
 
   const {item} = route.params;
   const {item: obj, taskDetails} = item;
-
-  console.log(taskDetails);
 
   const handleSheetOpenRequest = type => {
     setSheetActionType(type);
@@ -144,7 +159,7 @@ const ProjectInfo = ({navigation, user_data, route}) => {
               <View style={{marginHorizontal: SIZES.padding_4}}>
                 <InfoChips
                   text={`Client - ${taskDetails.taskState}`}
-                  textColor={obj.backgroundIdColor}
+                  textColor={COLORS.primary}
                 />
               </View>
               <Text style={{...FONTS.caption}}>
@@ -153,6 +168,15 @@ const ProjectInfo = ({navigation, user_data, route}) => {
             </View>
             {/* ============= ACTIONS - BUTTONS AND SHIT ========== */}
             <Divider style={{marginVertical: SIZES.padding_12}} />
+            {/* ========== PROJECT IMAGES AND FILES =========== */}
+
+            <FundiImageFiles
+              projectId={item}
+              sheetRef={image_selector_ref}
+              pickedFiles={images_to_upload}
+            />
+
+            {/* ==============  Action Section and shit ========= */}
             <SectionTitle label="Actions:" />
             <View style={styles._action_btn}>
               <Chip
@@ -181,6 +205,12 @@ const ProjectInfo = ({navigation, user_data, route}) => {
               </Chip>
             </View>
           </View>
+          <ImageSelector
+            sheetRef={image_selector_ref}
+            onRequestClose={() => image_selector_ref.current.snapTo(0)}
+            onImagesPicked={imgs => setImagesToUpload(imgs)}
+            selectMultiple={true}
+          />
         </View>
       </ScrollView>
 
@@ -219,6 +249,73 @@ const ProjectInfo = ({navigation, user_data, route}) => {
   );
 };
 
+async function getPathForFirebaseStorage(uri) {
+  const stat = await RNFetchBlob.fs.stat(uri);
+  return stat.path;
+}
+
+const FundiImageFiles = ({projectId, sheetRef, pickedFiles}) => {
+  const [images, setImages] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  const [fetch, setFetching] = useState(false);
+  const [upload, setUpload] = useState(false);
+
+  const reference = storage().ref(`fundis-projects`);
+
+  if (fetch)
+    return (
+      <View style={{alignItems: 'center'}}>
+        <LoaderSpinner.Wave height={70} width={70} />
+      </View>
+    );
+  return (
+    <View>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginVertical: SIZES.padding_16,
+        }}>
+        <Text style={{...FONTS.captionBold}}>Project Images</Text>
+        <AntDesign
+          name="addfile"
+          size={SIZES.icon_size}
+          color={COLORS.secondary}
+          onPress={() => sheetRef.current.snapTo(2)}
+        />
+      </View>
+      {!images.length ? (
+        <LoadingNothing
+          label={'No images for this project'}
+          height={50}
+          width={50}
+        />
+      ) : (
+        <ScrollView horizontal={true}>
+          {images.map((el, idx) => {
+            return (
+              <Card
+                style={{marginRight: SIZES.base, borderRadius: SIZES.base}}
+                key={idx}>
+                <Image
+                  source={require('../assets/profile.png')}
+                  defaultSource={require('../assets/profile.png')}
+                  style={styles._project_image_file}
+                />
+                <Text style={styles._img_caption}>Some nice caption</Text>
+              </Card>
+            );
+          })}
+        </ScrollView>
+      )}
+      <LoadingModal
+        onDismiss={() => setUpload(false)}
+        show={upload}
+        label={'Uplaoding files.......'}
+      />
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -244,6 +341,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: SIZES.padding_16,
     width: '100%',
+  },
+  _project_image_file: {
+    height: 180,
+    width: 180,
+  },
+  _img_caption: {
+    position: 'absolute',
+    bottom: 0,
+    paddingVertical: SIZES.base,
+    backgroundColor: '#00000060',
+    width: '100%',
+    color: COLORS.white,
+    paddingHorizontal: SIZES.padding_4,
+    ...FONTS.captionBold,
   },
 });
 

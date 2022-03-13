@@ -23,7 +23,6 @@ const UISettingsActions = {
   refresh_component: () => {
     return {
       type: 'REFRESH_COMPONENT',
-      payload: '',
     };
   },
 
@@ -36,6 +35,13 @@ const UISettingsActions = {
   hide_project_banner: () => {
     return {
       type: 'HIDE_PROJECT_BANNER',
+    };
+  },
+  //
+  toggle_snack_bar: message => {
+    return {
+      type: 'SHOW_SNACKBAR',
+      payload: message,
     };
   },
 };
