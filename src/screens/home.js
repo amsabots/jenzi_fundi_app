@@ -64,11 +64,17 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
     return true;
   };
 
+  const subscribe_to_instances = useCallback(() => {
+    consume_from_pusher(user_data.user.accountId);
+  }, []);
+
   const dispatch = useDispatch();
 
   //run on the first screen render
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', backButtonHandler);
+    //connect to pusher channel
+    subscribe_to_instances();
     return () => {
       setLoad(false);
     };

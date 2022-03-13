@@ -42,7 +42,6 @@ const App = () => {
   return (
     <>
       <Provider store={store}>
-        <PostActionRunner />
         <PaperProvider theme={appTheme}>
           <MenuProvider>
             <PrimaryStatusBar />
