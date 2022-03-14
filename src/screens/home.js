@@ -21,7 +21,7 @@ import EvilCons from 'react-native-vector-icons/EvilIcons';
 import IoIcons from 'react-native-vector-icons/Ionicons';
 import ProjectAlert from './sub-components/project-info';
 import {LoaderSpinner, LoadingNothing} from '../components';
-import {debounce} from '../config';
+import {Chip, Divider, Card} from 'react-native-paper';
 
 const logger = console.log.bind(console, '[home.js: Home screen] ');
 
@@ -36,6 +36,14 @@ export const LoaderView = (
     <Text>Fetching projects......</Text>
   </View>
 );
+
+const SummaryCard = ({bgColor, txtColor}) => {
+  return (
+    <View>
+      <Card></Card>
+    </View>
+  );
+};
 
 const Home = ({navigation, user_data, clientsData, tasks}) => {
   const {selected_job} = tasks;
@@ -124,8 +132,48 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
         </Text>
       </View>
       {/* ============ CONTENT AREA ================= */}
-      <View style={styles.content}></View>
-      <ProjectAlert />
+      <View style={styles.content}>
+        <View style={styles._summary_header}>
+          <Text style={{...FONTS.caption}}>
+            You have an active project with:{' '}
+            <Text style={{...FONTS.captionBold}}>Client name</Text>
+          </Text>
+          <Chip
+            style={{backgroundColor: COLORS.secondary, marginLeft: SIZES.base}}>
+            <Text style={{...FONTS.caption, color: COLORS.white}}>
+              Open chats
+            </Text>
+          </Chip>
+        </View>
+        <Divider style={{marginVertical: SIZES.padding_12}} />
+        {/* ================ END OF HEADER SECTION =================== */}
+        <View style={{flexDirection: 'row'}}>
+          <Card
+            style={{
+              height: 120,
+              padding: SIZES.padding_16,
+              flexGrow: 1,
+              backgroundColor: COLORS.secondary,
+              marginRight: SIZES.base,
+            }}>
+            <Text style={{...FONTS.body_bold, color: COLORS.white}}>
+              Total projects
+            </Text>
+          </Card>
+          <Card
+            style={{
+              height: 120,
+              padding: SIZES.padding_16,
+              flexGrow: 1,
+              backgroundColor: COLORS.blue_deep,
+            }}>
+            <Text style={{...FONTS.body_bold, color: COLORS.white}}>
+              Completed
+            </Text>
+          </Card>
+        </View>
+      </View>
+      <ProjectAlert navigation={navigation} />
     </View>
   );
 };
@@ -164,6 +212,11 @@ const styles = StyleSheet.create({
   },
   _account_status_banner_text: {
     ...FONTS.caption,
+  },
+  _summary_header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
 

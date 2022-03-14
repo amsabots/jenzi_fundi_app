@@ -57,12 +57,10 @@ const TopHeader = ({nav}) => {
 
 const ConversationScreen = ({navigation, chats, route, user_data}) => {
   //get passed parameters from the previous screen
-  const {i} = route.params;
-  const {chatRoomId, partyB} = i.connection;
-  const {chats: conversations, pager} = chats;
   const {user} = user_data;
   //  screen/componet state
   const [refreshing, setRefreshing] = useState(false);
+  const [conversations, setConversation] = useState([]);
 
   //hooks
   const dispatch = useDispatch();
@@ -75,26 +73,6 @@ const ConversationScreen = ({navigation, chats, route, user_data}) => {
       .catch(er => console.log(er));
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      ToastAndroid.showWithGravityAndOffset(
-        'updating..',
-        ToastAndroid.SHORT,
-        ToastAndroid.TOP,
-        0,
-        100,
-      );
-
-      axios
-        .get(
-          `${endpoints.fundi_service}/chats?chatRoomId=${chatRoomId}&limit=${pager.page_size}&page=${pager.current_page}`,
-        )
-        .then(res => dispatch(chat_actions.load_chats(res.data.chats)))
-        .catch(err => {
-          dispatch(chat_actions.load_chats([]));
-        });
-    }, [i]),
-  );
   return (
     <View style={styles.container}>
       <TopHeader nav={navigation} />

@@ -23,7 +23,7 @@ import {endpoints} from '../../endpoints';
 import toast from 'react-native-toast-message';
 
 import {popPushNotification} from '../../notifications';
-import {offline_data, pusher_filters} from '../../constants';
+import {offline_data, pusher_filters, screens} from '../../constants';
 import {clientActions, UISettingsActions} from '../../store-actions';
 import {delete_current_request} from '../../pusher/project-ops';
 
@@ -32,7 +32,7 @@ const mapStateToProps = state => {
   return {user_data, clientsData, tasks};
 };
 
-const ProjectAlert = ({tasks, user_data, clientsData}) => {
+const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
   const {client_request, selected_client} = clientsData;
   //component state variables
   const [task_alert, setTask_alert] = useState(false);
@@ -52,9 +52,15 @@ const ProjectAlert = ({tasks, user_data, clientsData}) => {
         filterType: pusher_filters.user_rejected,
       });
     } catch (error) {
+      console.log(error);
     } finally {
       dispatch(clientActions.expire_request());
       toast.show({type: 'success', text1: 'Response sent'});
+      dispatch(
+        UISettingsActions.toggle_snack_bar(
+          `Request has been cancelled successfully. Thank you for being our active member`,
+        ),
+      );
     }
   };
 
@@ -70,19 +76,15 @@ const ProjectAlert = ({tasks, user_data, clientsData}) => {
         filterType: pusher_filters.user_accepted,
         requestId: client_request.requestId,
       });
-      await AsyncStorage.setItem(
-        offline_data.current_project_user,
-        JSON.stringify(selected_client),
-      );
-      toast.show({text1: 'Project has been initiated', position: 'top'});
       dispatch(
         UISettingsActions.toggle_snack_bar(
-          `Congratulations ${user_data.user.name}, you have secured a project with the client identified as ${selected_client.name}. We will help you track and connect with the specified client`,
+          `Congratulations ${user_data.user.name}, new project has been initiated`,
         ),
       );
+      navigation.navigate(screens.conversation);
     } catch (error) {
       console.log(
-        `[file: project-info.js] [action: deleting sent request] [message: ${error}]`,
+        `[file: project-info.js] [action: accept response failed to reach destination] [message: ${error}]`,
       );
       ToastAndroid.showWithGravity(
         'Project creation failed during initiation. Sorry for the inconvenience',
