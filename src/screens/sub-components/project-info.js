@@ -81,7 +81,7 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
           `Congratulations ${user_data.user.name}, new project has been initiated`,
         ),
       );
-      navigation.navigate(screens.conversation);
+      navigation.navigate(screens.conversation, {});
     } catch (error) {
       console.log(
         `[file: project-info.js] [action: accept response failed to reach destination] [message: ${error}]`,

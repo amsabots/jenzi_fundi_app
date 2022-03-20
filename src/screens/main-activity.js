@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useCallback} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 //redux
 import {useDispatch, connect} from 'react-redux';
@@ -6,12 +6,15 @@ import {UISettingsActions, user_data_actions} from '../store-actions';
 //sqlite
 import storage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen';
+import {subscribe_job_states} from '../pusher';
 
 import {offline_data, screens} from '../constants';
 import {useNavigation} from '@react-navigation/native';
 import {LoadingNothing, LoaderSpinner} from '../components';
 import {SIZES} from '../constants/themes';
 import {UISettings} from '../../store/ui-store';
+
+const logger = console.log.bind(console, `[file: main-activity.js]`);
 
 const mapStateToProps = state => {
   const {user_data} = state;
@@ -21,9 +24,13 @@ const mapStateToProps = state => {
 const MainActivity = ({user_data}) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+
   useEffect(() => {
     SplashScreen.hide();
     dispatch(UISettingsActions.status_bar(false));
+    /*
+     * @Todo  tweak this line to remove/fix home page flashing during initial mount
+     */
     storage
       .getItem(offline_data.user)
       .then(d => {
@@ -40,6 +47,17 @@ const MainActivity = ({user_data}) => {
           });
       })
       .catch(err => dispatch(user_data_actions.delete_user()));
+
+    //  subscriptions
+    if (Object.keys(user_data.user).length > 0) {
+      subscribe_job_states(user_data.user);
+    }
+
+    return () => {
+      logger(
+        `[message: Main activity has been unmounted - the whole system is unmounted]`,
+      );
+    };
   }, [user_data]);
 
   return (

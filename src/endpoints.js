@@ -7,9 +7,7 @@ export const endpoints = {
   firebase_database: `https://jenzi-1234d-default-rtdb.asia-southeast1.firebasedatabase.app/`,
 };
 
-export const firebase_reference = firebase
-  .app()
-  .database(endpoints.firebase_database);
+export const firebase_db = firebase.app().database(endpoints.firebase_database);
 
 export const errorMessage = err => {
   if (err.response) {

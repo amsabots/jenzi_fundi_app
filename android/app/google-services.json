@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "767171095114",
+    "firebase_url": "https://jenzi-1234d-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "jenzi-1234d",
     "storage_bucket": "jenzi-1234d.appspot.com"
   },
@@ -13,6 +14,43 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "767171095114-2pr52480vdomknftm54q6k3hiej6mh32.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwGQLGm4nXTKLuWkbhGYEl-IrVu--42aY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "767171095114-2pr52480vdomknftm54q6k3hiej6mh32.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767171095114:android:7902528ea0085ad88154b3",
+        "android_client_info": {
+          "package_name": "com.jenzi_client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "767171095114-5indr71fhpr1eic04c0n6ss5d5m26p2m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jenzi_client",
+            "certificate_hash": "9c9a8a92b7efb714e19163b45b1f2898e0d44904"
+          }
+        },
         {
           "client_id": "767171095114-2pr52480vdomknftm54q6k3hiej6mh32.apps.googleusercontent.com",
           "client_type": 3

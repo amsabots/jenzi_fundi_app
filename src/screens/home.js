@@ -1,4 +1,11 @@
-import React, {useEffect, useState, useCallback, useMemo, useRef} from 'react';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  memo,
+} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {View, StyleSheet, BackHandler, ToastAndroid, Text} from 'react-native';
 import {popPushNotification} from '../notifications';
@@ -13,7 +20,7 @@ import {chat_actions, task_actions, UISettingsActions} from '../store-actions';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 
 // subscribtions
-import {consume_from_pusher} from '../pusher';
+import {subscribe_job_states} from '../pusher';
 import {screens} from '../constants';
 
 //Icons
@@ -45,8 +52,7 @@ const SummaryCard = ({bgColor, txtColor}) => {
   );
 };
 
-const Home = ({navigation, user_data, clientsData, tasks}) => {
-  const {selected_job} = tasks;
+const Home = memo(({navigation, user_data, clientsData, tasks}) => {
   const {user} = user_data;
 
   // component state variables
@@ -72,17 +78,13 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
     return true;
   };
 
-  const subscribe_to_instances = useCallback(() => {
-    consume_from_pusher(user_data.user.accountId);
-  }, []);
-
   const dispatch = useDispatch();
 
   //run on the first screen render
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', backButtonHandler);
-    //connect to pusher channel
-    subscribe_to_instances();
+    //connect to job state channel
+
     return () => {
       setLoad(false);
     };
@@ -176,7 +178,7 @@ const Home = ({navigation, user_data, clientsData, tasks}) => {
       <ProjectAlert navigation={navigation} />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
