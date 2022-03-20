@@ -16,6 +16,7 @@ const screens = {
   location_picker: 'LocationPicker',
   rate_client: 'rateClient',
   project_info: 'projectInfo',
+  fundi_reviews: 'FUNDIREVIEWS',
 };
 
 export {screens};

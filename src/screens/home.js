@@ -1,7 +1,8 @@
 import React, {useEffect, useState, useCallback, memo} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {View, StyleSheet, BackHandler, ToastAndroid, Text} from 'react-native';
-import {popPushNotification} from '../notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {offline_data} from '../constants';
 
 //bottom sheet
 
@@ -21,6 +22,11 @@ import IoIcons from 'react-native-vector-icons/Ionicons';
 import ProjectAlert from './sub-components/project-info';
 import {LoaderSpinner, LoadingNothing} from '../components';
 import {Chip, Divider, Card} from 'react-native-paper';
+// sub view components
+import {
+  HomeSummaryInfo,
+  AccountStarRating,
+} from './sub-components/home-summary-info';
 
 const logger = console.log.bind(console, '[home.js: Home screen] ');
 
@@ -36,19 +42,19 @@ export const LoaderView = (
   </View>
 );
 
-const SummaryCard = ({bgColor, txtColor}) => {
-  return (
-    <View>
-      <Card></Card>
-    </View>
-  );
-};
-
 const Home = memo(({navigation, user_data, clientsData, tasks}) => {
   const {user} = user_data;
 
   // component state variables
   const [load, setLoad] = useState(false);
+  const [activeClient, setActiveClient] = useState({});
+
+  const fetch_from_offline = async () => {
+    const client = await AsyncStorage.getItem(
+      offline_data.current_project_user,
+    );
+    setActiveClient(JSON.parse(client));
+  };
 
   // back button Handler
   let backHandlerClickCount = 0;
@@ -90,6 +96,7 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
       //check if the user has all information setup
       if (!user.latitude) navigation.navigate(screens.location_picker);
       dispatch(UISettingsActions.status_bar(false));
+      fetch_from_offline();
       return () => {
         BackHandler.removeEventListener('hardwareBackPress', backButtonHandler);
         setLoad(false);
@@ -127,18 +134,25 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
       </View>
       {/* ============ CONTENT AREA ================= */}
       <View style={styles.content}>
-        <View style={styles._summary_header}>
-          <Text style={{...FONTS.caption}}>
-            You have an active project with:{' '}
-            <Text style={{...FONTS.captionBold}}>Client name</Text>
-          </Text>
-          <Chip
-            style={{backgroundColor: COLORS.secondary, marginLeft: SIZES.base}}>
-            <Text style={{...FONTS.caption, color: COLORS.white}}>
-              Open chats
+        {Object.keys(activeClient).length ? (
+          <View style={styles._summary_header}>
+            <Text style={{...FONTS.caption}}>
+              Active project with{' '}
+              <Text style={{...FONTS.captionBold}}>
+                {activeClient.name.toUpperCase()}
+              </Text>
             </Text>
-          </Chip>
-        </View>
+            <Chip
+              style={{
+                backgroundColor: COLORS.secondary,
+                marginLeft: SIZES.base,
+              }}>
+              <Text style={{...FONTS.caption, color: COLORS.white}}>
+                Open chats
+              </Text>
+            </Chip>
+          </View>
+        ) : null}
         <Divider style={{marginVertical: SIZES.padding_12}} />
         {/* ================ END OF HEADER SECTION =================== */}
         <View style={{flexDirection: 'row'}}>
@@ -153,6 +167,9 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
             <Text style={{...FONTS.body_bold, color: COLORS.white}}>
               Total projects
             </Text>
+            <View style={styles._details_value}>
+              <Text style={styles._details_value_txt}>0</Text>
+            </View>
           </Card>
           <Card
             style={{
@@ -164,8 +181,15 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
             <Text style={{...FONTS.body_bold, color: COLORS.white}}>
               Completed
             </Text>
+            <View style={styles._details_value}>
+              <Text style={styles._details_value_txt}>0</Text>
+            </View>
           </Card>
         </View>
+        {/* ============== END OF THE PROJECTS SUMMARY INFO ============ */}
+        <HomeSummaryInfo />
+        <Divider />
+        <AccountStarRating navigation={navigation} />
       </View>
       <ProjectAlert navigation={navigation} />
     </View>
@@ -211,6 +235,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  _details_value: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  _details_value_txt: {
+    ...FONTS.h6,
+    color: COLORS.white,
   },
 });
 

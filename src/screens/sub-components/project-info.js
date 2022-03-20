@@ -9,6 +9,7 @@ import React, {
 import BottomSheet from '@gorhom/bottom-sheet';
 //sqlite
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {jobUtils} from '../../pusher';
 
 import {View, Text, ToastAndroid} from 'react-native';
 import {COLORS, FONTS, SIZES} from '../../constants/themes';
@@ -33,29 +34,33 @@ const mapStateToProps = state => {
 
 const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
   const {client_request, selected_client} = clientsData;
-  console.log(client_request, selected_client);
   //component state variables
   const [task_alert, setTask_alert] = useState(false);
   //component hooks
   const dispatch = useDispatch();
-  const snapPoints = useMemo(() => ['2%', '50%', '80%'], []);
+  const snapPoints = useMemo(() => ['10%', '50%', '80%'], []);
   const sheetRef = useRef();
   const handleRequestRejection = async () => {
     try {
-      delete_current_request(client_request.requestId);
-      await axios.post(`${endpoints.notification_server}/notify-once`, {
-        payload: {
-          requestId: client_request.requestId,
+      // update redis record
+      await axios.put(
+        `${endpoints.notification_base}/jobs/requests/${client_request.requestId}`,
+        {
+          status: 'REQUESTDECLINED',
         },
-        sourceAddress: user_data.user.accountId,
-        destinationAddress: selected_client.clientId,
-        filterType: pusher_filters.user_rejected,
-      });
+      );
+      // update firebase records in the db
+      await jobUtils.update_client(
+        'REQUESTDECLINED',
+        selected_client.clientId,
+        client_request.requestId,
+      );
     } catch (error) {
       console.log(error);
     } finally {
       dispatch(clientActions.expire_request());
-      toast.show({type: 'success', text1: 'Response sent'});
+      toast.show({type: 'success', text1: 'Sent response to client'});
+      await jobUtils.delete_entry(user_data.user.accountId);
       dispatch(
         UISettingsActions.toggle_snack_bar(
           `Request has been cancelled successfully. Thank you for being our active member`,
@@ -66,16 +71,23 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
 
   const handle_accept_request = async () => {
     try {
-      delete_current_request(client_request.requestId);
-      await axios.post(`${endpoints.notification_server}/notify`, {
-        payload: {
-          title: client_request.title,
+      // update the redis record in the db
+      await axios.put(
+        `${endpoints.notification_base}/jobs/requests/${client_request.requestId}`,
+        {
+          status: 'REQUESTACCEPTED',
         },
-        sourceAddress: user_data.user.accountId,
-        destinationAddress: selected_client.clientId,
-        filterType: pusher_filters.user_accepted,
-        requestId: client_request.requestId,
-      });
+      );
+      // update client alert entries in firebase
+      await jobUtils.update_client(
+        'REQUESTACCEPTED',
+        selected_client.clientId,
+        client_request.requestId,
+      );
+      await AsyncStorage.setItem(
+        offline_data.current_project_user,
+        JSON.stringify(selected_client),
+      );
       dispatch(
         UISettingsActions.toggle_snack_bar(
           `Congratulations ${user_data.user.name}, new project has been initiated`,
@@ -93,6 +105,7 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
       );
     } finally {
       dispatch(clientActions.expire_request());
+      await jobUtils.delete_entry(user_data.user.accountId);
     }
   };
 
@@ -170,7 +183,6 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
         <View
           style={{
             flex: 1,
-            justifyContent: 'center',
             alignItems: 'center',
             paddingHorizontal: SIZES.padding_16,
           }}>

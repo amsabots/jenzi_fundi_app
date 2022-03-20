@@ -22,7 +22,7 @@ const nothing_to_show = (
   </View>
 );
 
-const ReviewItem = ({review, onLonpressListener}) => {
+export const ReviewItem = ({review, onLonpressListener}) => {
   return (
     <TouchableOpacity
       activeOpacity={0.9}
@@ -183,4 +183,3 @@ const styles = StyleSheet.create({
 });
 
 export default connect(mapStateToProps)(RateClient);
-

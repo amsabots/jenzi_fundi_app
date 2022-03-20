@@ -54,6 +54,7 @@ export const SIZES = {
   centerInView: {
     justifyContent: 'center',
     alignItems: 'center',
+    flex: 1,
   },
   //font sizes
 };

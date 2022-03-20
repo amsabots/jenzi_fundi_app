@@ -59,3 +59,18 @@ export const subscribe_job_states = user => {
       }
     });
 };
+
+export const jobUtils = {
+  delete_entry: async function (accountId) {
+    await firebase_db.ref(`/jobalerts/${accountId}`).remove();
+  },
+  update_client: async function client_alerts(alert, client_id, job_id) {
+    await firebase_db
+      .ref(`/jobalerts/${client_id}`)
+      .update({
+        createdAt: new Date().getTime(),
+        event: alert,
+        requestId: job_id,
+      });
+  },
+};

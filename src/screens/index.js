@@ -12,6 +12,7 @@ import LocationPicker from './location-picker';
 import RateClient from './rate-client';
 import ProjectInfo from './project-info';
 import ConversationScreen from './conversation';
+import FundiReviews from './fundi-reviews-listing';
 
 export {
   HomeView,
@@ -28,4 +29,5 @@ export {
   ProjectInfo,
   RateClient,
   ConversationScreen,
+  FundiReviews,
 };
