@@ -25,7 +25,6 @@ import toast from 'react-native-toast-message';
 import {popPushNotification} from '../../notifications';
 import {offline_data, pusher_filters, screens} from '../../constants';
 import {clientActions, UISettingsActions} from '../../store-actions';
-import {delete_current_request} from '../../pusher/project-ops';
 
 const mapStateToProps = state => {
   const {user_data, clientsData, tasks} = state;
@@ -34,6 +33,7 @@ const mapStateToProps = state => {
 
 const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
   const {client_request, selected_client} = clientsData;
+  console.log(client_request, selected_client);
   //component state variables
   const [task_alert, setTask_alert] = useState(false);
   //component hooks

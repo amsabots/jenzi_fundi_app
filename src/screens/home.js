@@ -1,11 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-  memo,
-} from 'react';
+import React, {useEffect, useState, useCallback, memo} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {View, StyleSheet, BackHandler, ToastAndroid, Text} from 'react-native';
 import {popPushNotification} from '../notifications';
@@ -20,7 +13,6 @@ import {chat_actions, task_actions, UISettingsActions} from '../store-actions';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 
 // subscribtions
-import {subscribe_job_states} from '../pusher';
 import {screens} from '../constants';
 
 //Icons
