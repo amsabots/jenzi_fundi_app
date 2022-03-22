@@ -6,7 +6,8 @@ import {UISettingsActions, user_data_actions} from '../store-actions';
 //sqlite
 import storage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen';
-import {subscribe_job_states} from '../pusher';
+//firebase
+import {subscribe_job_states, subscribe_to_chatrooms} from '../pusher';
 
 import {offline_data, screens} from '../constants';
 import {useNavigation} from '@react-navigation/native';
@@ -51,6 +52,7 @@ const MainActivity = ({user_data}) => {
     //  subscriptions
     if (Object.keys(user_data.user).length > 0) {
       subscribe_job_states(user_data.user);
+      subscribe_to_chatrooms(user_data.user.accountId);
     }
 
     return () => {

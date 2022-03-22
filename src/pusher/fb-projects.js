@@ -2,13 +2,8 @@ import {endpoints, firebase_db} from '../endpoints';
 import {popPushNotification} from '../notifications';
 import axios from 'axios';
 import {store} from '../../App';
-import {
-  clientActions,
-  fundiActions,
-  task_actions,
-  UISettingsActions,
-} from '../store-actions';
-import {create} from 'lodash';
+import {clientActions} from '../store-actions';
+
 const logger = console.log.bind(console, `[file: fb-projects.js]`);
 
 //request cancelled or it came in and expired
@@ -65,12 +60,10 @@ export const jobUtils = {
     await firebase_db.ref(`/jobalerts/${accountId}`).remove();
   },
   update_client: async function client_alerts(alert, client_id, job_id) {
-    await firebase_db
-      .ref(`/jobalerts/${client_id}`)
-      .update({
-        createdAt: new Date().getTime(),
-        event: alert,
-        requestId: job_id,
-      });
+    await firebase_db.ref(`/jobalerts/${client_id}`).update({
+      createdAt: new Date().getTime(),
+      event: alert,
+      requestId: job_id,
+    });
   },
 };
