@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import {Divider} from 'react-native-paper';
+import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 
 //ui components
 import {CircularImage, LoadingNothing, MapMarker} from '../components';
@@ -10,13 +12,12 @@ import IoIcons from 'react-native-vector-icons/Ionicons';
 
 // dispatch
 import {connect, useDispatch} from 'react-redux';
+//Theming
 import {COLORS, FONTS, SIZES} from '../constants/themes';
-import {Divider} from 'react-native-paper';
-import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import {screens} from '../constants';
 import moment from 'moment';
-import axios from 'axios';
-import {endpoints} from '../endpoints';
+//network route handler
+import {firebase_db} from '../endpoints';
 
 const mapStateToProps = state => {
   const {user_data, chats} = state;
@@ -59,24 +60,24 @@ export const ChatItemFooter = ({time, status, belongs_to_user}) => {
   );
 };
 
-const ChatItem = ({item, onItemClick, user}) => {
-  const {connection, lastMessage} = item;
-  const [partyB_name, setPartyBName] = useState('Identifying....');
-  const is_belong_to_logged_user = () => {
-    if (user.id === lastMessage.sourceId) return true;
-    return false;
-  };
+const ChatItem = ({onItemClick, user, chat_room_id}) => {
+  const [lastmessage, setLastMessage] = useState({chatId: '', data: ''});
   useEffect(() => {
-    axios
-      .get(`${endpoints.client_service}/clients/${connection.partyB}`)
-      .then(res => {
-        setPartyBName(res.data.name);
-      })
-      .catch(err => {
-        console.log(err);
-        setPartyBName('Name not found');
+    firebase_db
+      .ref(`/chats/${chat_room_id}`)
+      .limitToLast(1)
+      .on(`value`, s => {
+        if (s.exists()) {
+          const chat_id = Object.keys(s.toJSON())[0];
+          const data = s.toJSON()[chat_id];
+          setLastMessage({chatId: chat_id, data});
+        }
       });
+    return () => {
+      firebase_db.ref(`/chats/${chat_room_id}`).off('value');
+    };
   }, []);
+
   return (
     <TouchableOpacity
       style={styles._chat_item_container}
@@ -86,12 +87,16 @@ const ChatItem = ({item, onItemClick, user}) => {
         <CircularImage size={SIZES.size_48} />
       </View>
       <View style={styles._chat_item_text_area}>
-        <Text style={{...FONTS.body_bold}}>{partyB_name}</Text>
-        <Text>{lastMessage.message}</Text>
+        <Text style={{...FONTS.body_bold}}>{user?.name || 'Unknown user'}</Text>
+        <Text>
+          {Object.values(lastmessage).filter(Boolean).length
+            ? lastmessage.data.message
+            : 'hi'}
+        </Text>
         <ChatItemFooter
-          time={lastMessage.createdAt}
-          status={lastMessage.delivered}
-          belongs_to_user={is_belong_to_logged_user()}
+          time={1647979027917}
+          status={false}
+          belongs_to_user={true}
         />
         <Divider style={styles._divider} />
       </View>
@@ -106,9 +111,7 @@ const ChatList = ({user_data, navigation, chats}) => {
   const {chat_rooms} = chats;
   //event dispatcher hook
   const dispatch = useDispatch();
-
   //testing area
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -144,8 +147,8 @@ const ChatList = ({user_data, navigation, chats}) => {
                   onItemClick={i =>
                     navigation.navigate(screens.conversation, {i})
                   }
-                  item={item}
-                  user={user}
+                  user={item.client}
+                  chat_room_id={item.chatroom}
                 />
               );
             }}

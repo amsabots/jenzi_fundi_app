@@ -82,7 +82,6 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', backButtonHandler);
     //connect to job state channel
-
     return () => {
       setLoad(false);
     };
@@ -100,6 +99,7 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
       return () => {
         BackHandler.removeEventListener('hardwareBackPress', backButtonHandler);
         setLoad(false);
+        setActiveClient({});
       };
     }, [user_data]),
   );

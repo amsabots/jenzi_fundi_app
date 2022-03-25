@@ -2,6 +2,7 @@ const initialState = {
   chats: [],
   chat_rooms: [],
   selected_chat: {},
+  last_chat_item: [],
   pager: {
     current_page: 0,
     page_size: 20,
@@ -19,6 +20,8 @@ export const chats = (state = initialState, action) => {
       return {...state, chat_rooms: payload};
     case 'LOAD_NEW_CHATS':
       return {...state, chats: payload};
+    case 'SET_LAST_CHAT_ITEM':
+      return {...state, last_chat_item: payload};
     case 'lOAD_MORE_CHATS':
       return {...state, chats: [...state.chats, ...payload]};
     default:

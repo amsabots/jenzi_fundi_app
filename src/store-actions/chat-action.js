@@ -17,4 +17,8 @@ export const chat_actions = {
       },
     };
   },
+  //SET_LAST_CHAT_ITEM
+  load_last_chat_items: function (last_chat_item_array) {
+    return {payload: last_chat_item_array, type: 'SET_LAST_CHAT_ITEM'};
+  },
 };
