@@ -7,6 +7,8 @@ import {
 } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 
+const logger = console.log.bind(console, '[file: current-location.js]');
+
 const hasLocationPermission = async () => {
   if (Platform.OS === 'android' && Platform.Version < 23) {
     return true;
@@ -34,6 +36,9 @@ const getCurrentLocation = () => {
 
     Geolocation.getCurrentPosition(
       position => {
+        logger(
+          `[info: position plotted] [latitude: ${position.coords.latitude}] [longitude: ${position.coords.longitude}]`,
+        );
         res(position);
       },
       error => {

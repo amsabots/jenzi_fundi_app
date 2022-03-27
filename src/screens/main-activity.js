@@ -27,6 +27,9 @@ const MainActivity = ({user_data}) => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    logger(
+      `[message: main activity has rendered, re-render can be initiated due to changes of user data props from redux store]`,
+    );
     SplashScreen.hide();
     dispatch(UISettingsActions.status_bar(false));
     /*
@@ -35,11 +38,12 @@ const MainActivity = ({user_data}) => {
     storage
       .getItem(offline_data.user)
       .then(d => {
+        const d_object = JSON.parse(d);
         dispatch(user_data_actions.create_user(JSON.parse(d)));
         if (d) {
-          if (Object.keys(user_data.user).length > 0) {
-            subscribe_job_states(user_data.user);
-            subscribe_to_chatrooms(user_data.user.accountId);
+          if (Object.keys(d_object).length > 0) {
+            subscribe_job_states(d_object);
+            subscribe_to_chatrooms(d_object.accountId);
           }
           navigation.reset({
             index: 0,
@@ -60,7 +64,7 @@ const MainActivity = ({user_data}) => {
         `[message: Main activity has been unmounted - the whole system is unmounted]`,
       );
     };
-  }, [user_data]);
+  }, []);
 
   return (
     <View style={styles.container}>

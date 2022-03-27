@@ -28,6 +28,7 @@ const LocationPicker = ({user_data, navigation}) => {
   const [lat, setLat] = useState(null);
   const [lon, setLon] = useState(null);
   const [load, setLoading] = useState(false);
+  const [refresher, setRefreshing] = useState(0);
 
   // dispatch
   const dispatch = useDispatch();
@@ -93,6 +94,12 @@ const LocationPicker = ({user_data, navigation}) => {
               color={COLORS.secondary}
               onPress={() => navigation.goBack()}
             />
+            <MIcons
+              name="my-location"
+              size={SIZES.padding_32}
+              color={COLORS.secondary}
+              onPress={() => setRefreshing(prev => prev + 1)}
+            />
           </View>
           {/*  */}
         </View>
@@ -128,6 +135,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 100,
     padding: SIZES.padding_32,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
   },
 });
 

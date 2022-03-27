@@ -3,12 +3,6 @@ import React, {useEffect, useRef, useState, memo} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 import RNMapView, {Marker, Circle} from 'react-native-maps';
 import {COLORS} from '../constants/themes';
-//
-import {connect} from 'react-redux';
-
-//ui components
-import {MapMarker} from '.';
-import {DoubleRing} from './loading-animated';
 
 const Mapview = ({coordinates, onMarkerClicked}) => {
   const {latitude, longitude} = coordinates;
