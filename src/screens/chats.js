@@ -18,6 +18,7 @@ import {screens} from '../constants';
 import moment from 'moment';
 //network route handler
 import {firebase_db} from '../endpoints';
+import {chat_actions} from '../store-actions';
 
 const mapStateToProps = state => {
   const {user_data, chats} = state;
@@ -60,7 +61,7 @@ export const ChatItemFooter = ({time, status, belongs_to_user}) => {
   );
 };
 
-const ChatItem = ({onItemClick, user, chat_room_id}) => {
+const ChatItem = ({onItemClick, user, chat_room_id, current_user}) => {
   const [lastmessage, setLastMessage] = useState({chatId: '', data: ''});
   useEffect(() => {
     firebase_db
@@ -81,7 +82,7 @@ const ChatItem = ({onItemClick, user, chat_room_id}) => {
   return (
     <TouchableOpacity
       style={styles._chat_item_container}
-      onPress={() => onItemClick(item)}
+      onPress={() => onItemClick(user)}
       activeOpacity={0.9}>
       <View>
         <CircularImage size={SIZES.size_48} />
@@ -91,12 +92,12 @@ const ChatItem = ({onItemClick, user, chat_room_id}) => {
         <Text>
           {Object.values(lastmessage).filter(Boolean).length
             ? lastmessage.data.message
-            : 'hi'}
+            : 'Be the first one to say Hi'}
         </Text>
         <ChatItemFooter
-          time={1647979027917}
-          status={false}
-          belongs_to_user={true}
+          time={lastmessage.createdAt}
+          status={lastmessage.delivered}
+          belongs_to_user={current_user.accountId === lastmessage.source}
         />
         <Divider style={styles._divider} />
       </View>
@@ -144,11 +145,13 @@ const ChatList = ({user_data, navigation, chats}) => {
             renderItem={({item}) => {
               return (
                 <ChatItem
-                  onItemClick={i =>
-                    navigation.navigate(screens.conversation, {i})
-                  }
+                  onItemClick={i => {
+                    dispatch(chat_actions.active_chat(i));
+                    navigation.navigate(screens.conversation);
+                  }}
                   user={item.client}
                   chat_room_id={item.chatroom}
+                  current_user={user}
                 />
               );
             }}
@@ -197,7 +200,7 @@ const styles = StyleSheet.create({
   _footer_item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: SIZES.base,
+    marginTop: SIZES.padding_4,
   },
   _divider: {
     marginTop: SIZES.base,

@@ -25,7 +25,11 @@ import toast from 'react-native-toast-message';
 
 import {popPushNotification} from '../../notifications';
 import {offline_data, pusher_filters, screens} from '../../constants';
-import {clientActions, UISettingsActions} from '../../store-actions';
+import {
+  chat_actions,
+  clientActions,
+  UISettingsActions,
+} from '../../store-actions';
 
 const mapStateToProps = state => {
   const {user_data, clientsData, tasks} = state;
@@ -93,7 +97,8 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
           `Congratulations ${user_data.user.name}, new project has been initiated`,
         ),
       );
-      navigation.navigate(screens.conversation, {});
+      dispatch(chat_actions.active_chat(selected_client));
+      navigation.navigate(screens.conversation);
     } catch (error) {
       console.log(
         `[file: project-info.js] [action: accept response failed to reach destination] [message: ${error}]`,

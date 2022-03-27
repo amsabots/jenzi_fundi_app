@@ -8,7 +8,7 @@ import {useFocusEffect} from '@react-navigation/native';
 //redux store
 import {useDispatch, connect} from 'react-redux';
 import {UISettingsActions, user_data_actions} from '../store-actions';
-import {Button, Dialog, Portal} from 'react-native-paper';
+import {Button} from 'react-native-paper';
 //icons
 import MIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
@@ -16,6 +16,8 @@ import {endpoints, errorMessage} from '../endpoints';
 import toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {offline_data} from '../constants';
+
+const logger = console.log.bind(console, `[file: location-picker.js]`);
 
 const mapStateToProps = state => {
   const {user_data} = state;
@@ -63,6 +65,7 @@ const LocationPicker = ({user_data, navigation}) => {
     return () => {
       setLat(null);
       setLon(null);
+      setLoading(false);
     };
   }, []);
 

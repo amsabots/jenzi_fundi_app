@@ -27,6 +27,7 @@ import {
   HomeSummaryInfo,
   AccountStarRating,
 } from './sub-components/home-summary-info';
+import {chats} from '../../store/chats';
 
 const logger = console.log.bind(console, '[home.js: Home screen] ');
 
@@ -134,7 +135,7 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
       </View>
       {/* ============ CONTENT AREA ================= */}
       <View style={styles.content}>
-        {Object.keys(activeClient).length ? (
+        {Object.keys(activeClient || {}).length ? (
           <View style={styles._summary_header}>
             <Text style={{...FONTS.caption}}>
               Active project with{' '}
@@ -146,6 +147,10 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
               style={{
                 backgroundColor: COLORS.secondary,
                 marginLeft: SIZES.base,
+              }}
+              onPress={() => {
+                dispatch(chat_actions.active_chat(activeClient));
+                navigation.navigate(screens.conversation);
               }}>
               <Text style={{...FONTS.caption, color: COLORS.white}}>
                 Open chats

@@ -65,11 +65,17 @@ const Register = ({navigation}) => {
       .finally(() => setLoading(false));
   };
 
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, []);
+
   return (
     <ScrollView style={{backgroundColor: COLORS.white}}>
       <View style={styles.container}>
         <View>
-          <LoadingNothing label={'JENZI AFRICA'} textColor={COLORS.white} />
+          <LoadingNothing label={'JENZI SMART'} textColor={COLORS.white} />
         </View>
 
         <View style={styles.wrapper}>

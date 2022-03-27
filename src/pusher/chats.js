@@ -28,15 +28,3 @@ export const subscribe_to_chatrooms = current_user => {
       }
     });
 };
-
-// firebase_db
-//   .ref(`/chats/${chatroom}`)
-//   .limitToLast(1)
-//   .once('value')
-//   .then(s => {
-//     if (s.exists()) {
-//       const chat_id = Object.keys(s.toJSON())[0];
-//       const data = s.toJSON()[chat_id];
-//       console.log(chat_id, data);
-//     }
-//   });

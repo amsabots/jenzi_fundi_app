@@ -8,17 +8,10 @@ export const chat_actions = {
   load_more_chats: function (more_chats) {
     return {payload: more_chats, type: 'lOAD_MORE_CHATS'};
   },
-  update_page: function (current_page, page_size = 20) {
+  active_chat: function (active_chat) {
     return {
-      type: 'UPDATE_PAGE',
-      payload: {
-        current_page,
-        page_size,
-      },
+      type: 'ACTIVE_CHAT',
+      payload: active_chat,
     };
-  },
-  //SET_LAST_CHAT_ITEM
-  load_last_chat_items: function (last_chat_item_array) {
-    return {payload: last_chat_item_array, type: 'SET_LAST_CHAT_ITEM'};
   },
 };

@@ -36,12 +36,16 @@ const MainActivity = ({user_data}) => {
       .getItem(offline_data.user)
       .then(d => {
         dispatch(user_data_actions.create_user(JSON.parse(d)));
-        if (d)
+        if (d) {
+          if (Object.keys(user_data.user).length > 0) {
+            subscribe_job_states(user_data.user);
+            subscribe_to_chatrooms(user_data.user.accountId);
+          }
           navigation.reset({
             index: 0,
             routes: [{name: screens.stack_app}],
           });
-        else
+        } else
           navigation.reset({
             index: 0,
             routes: [{name: screens.stack_auth}],
@@ -50,10 +54,6 @@ const MainActivity = ({user_data}) => {
       .catch(err => dispatch(user_data_actions.delete_user()));
 
     //  subscriptions
-    if (Object.keys(user_data.user).length > 0) {
-      subscribe_job_states(user_data.user);
-      subscribe_to_chatrooms(user_data.user.accountId);
-    }
 
     return () => {
       logger(
