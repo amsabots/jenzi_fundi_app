@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, ToastAndroid, Linking} from 'react-native';
 import {
   DrawerContentScrollView,
   DrawerItemList,
@@ -11,9 +11,19 @@ import {NavHeader} from './sub-components';
 
 //
 import {appTheme, screens, theme} from '../constants';
-import {COLORS, SIZES} from '../constants/themes';
+import {COLORS, FONTS, SIZES} from '../constants/themes';
 
 const CustomDrawer = props => {
+  const loadInBrowser = () => {
+    Linking.openURL(`https://jenzismart.com/privacy-policy`).catch(err =>
+      ToastAndroid.showWithGravity(
+        'Browser provide declined request to open this policy',
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER,
+      ),
+    );
+  };
+
   return (
     <View style={styles.container}>
       <DrawerContentScrollView
@@ -39,6 +49,16 @@ const CustomDrawer = props => {
           onPress={() => props.navigation.navigate(screens.logout)}>
           Logout
         </Button>
+        <Text
+          style={{
+            textAlign: 'center',
+            ...FONTS.body_bold,
+            marginBottom: SIZES.base,
+            textDecorationLine: 'underline',
+          }}
+          onPress={loadInBrowser}>
+          Privacy policy {'&'} Data protection
+        </Text>
       </View>
     </View>
   );
