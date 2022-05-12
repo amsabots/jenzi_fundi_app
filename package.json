@@ -23,6 +23,7 @@
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/native-stack": "^6.2.5",
     "axios": "^0.25.0",
+    "joi": "^17.6.0",
     "lodash": "^4.17.21",
     "lottie-ios": "^3.2.3",
     "lottie-react-native": "^5.0.1",
@@ -48,7 +49,8 @@
     "react-native-toast-message": "^2.1.1",
     "react-native-vector-icons": "^9.1.0",
     "react-redux": "^7.2.6",
-    "redux": "^4.1.2"
+    "redux": "^4.1.2",
+    "text-encoding-polyfill": "^0.6.7"
   },
   "devDependencies": {
     "@babel/core": "7.17.5",

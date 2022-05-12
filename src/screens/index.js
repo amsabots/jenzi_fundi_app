@@ -13,6 +13,7 @@ import RateClient from './rate-client';
 import ProjectInfo from './project-info';
 import ConversationScreen from './conversation';
 import FundiReviews from './fundi-reviews-listing';
+import 'text-encoding-polyfill';
 
 export {
   HomeView,

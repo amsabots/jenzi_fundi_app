@@ -18,6 +18,7 @@ import axios from 'axios';
 
 //icon
 import {offline_data, screens} from '../constants';
+import {validation_schema} from '../config';
 
 const Register = ({navigation}) => {
   //app state
@@ -45,6 +46,13 @@ const Register = ({navigation}) => {
         text1: 'Passwords do not match',
         position: 'bottom',
       });
+    const validate = validation_schema.validate({username: email});
+    if (validate['error']) {
+      return ToastAndroid.show(
+        'Invalid phone number format provided',
+        ToastAndroid.LONG,
+      );
+    }
     setLoading(true);
     axios
       .post(`${endpoints.fundi_service}/accounts/register`, {
@@ -75,7 +83,16 @@ const Register = ({navigation}) => {
     <ScrollView style={{backgroundColor: COLORS.white}}>
       <View style={styles.container}>
         <View>
-          <LoadingNothing label={'JENZI SMART'} textColor={COLORS.white} />
+          <LoadingNothing textColor={COLORS.white} />
+          <Text
+            style={{
+              textAlign: 'center',
+              color: COLORS.white,
+              ...FONTS.h4,
+              marginTop: SIZES.padding_16,
+            }}>
+            JENZI SMART
+          </Text>
         </View>
 
         <View style={styles.wrapper}>
@@ -113,7 +130,7 @@ const Register = ({navigation}) => {
                 style={{marginRight: SIZES.base}}
               />
             }
-            placeholder="phonenumber/email"
+            placeholder="Phonenumber"
             onChangeText={txt => setEmail(txt)}
           />
           <TextInput
@@ -152,24 +169,36 @@ const Register = ({navigation}) => {
               Terms and Conditions
             </Text>
           </Text>
-          <Button
-            mode="contained"
-            loading={load}
-            onPress={handleRegistration}
-            style={{
-              backgroundColor: COLORS.secondary,
-              marginTop: SIZES.size_48,
-            }}>
-            Sign up
-          </Button>
-          <Text
-            style={{marginTop: SIZES.padding_16, textAlign: 'center'}}
-            onPress={() => navigation.navigate(screens.login)}>
-            Already have an account?{' '}
-            <Text style={{color: COLORS.blue_deep, ...FONTS.body_medium}}>
-              Login
-            </Text>
-          </Text>
+          {/* ====== ACTION buttons */}
+          <View style={styles._action_buttons_wrapper}>
+            <Button
+              mode="contained"
+              loading={load}
+              onPress={handleRegistration}
+              style={[
+                styles._action_btns,
+                {
+                  backgroundColor: COLORS.secondary,
+                },
+              ]}>
+              Register
+            </Button>
+            {/*  */}
+            <Button
+              mode="contained"
+              onPress={() => navigation.navigate(screens.login)}
+              style={[
+                styles._action_btns,
+                {
+                  backgroundColor: COLORS.blue_deep,
+                  marginLeft: SIZES.base,
+                },
+              ]}
+              labelStyle={{...FONTS.captionBold}}>
+              Back to Login
+            </Button>
+          </View>
+          {/*  */}
         </View>
       </View>
     </ScrollView>
@@ -192,6 +221,15 @@ const styles = StyleSheet.create({
   },
   _input_field: {
     marginBottom: SIZES.padding_32,
+  },
+  _action_buttons_wrapper: {
+    flexDirection: 'row',
+    width: '100%',
+    marginTop: SIZES.padding_16,
+    justifyContent: 'space-between',
+  },
+  _action_btns: {
+    flexGrow: 1,
   },
 });
 
