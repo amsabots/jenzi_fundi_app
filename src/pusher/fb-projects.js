@@ -25,7 +25,6 @@ export const subscribe_job_states = user => {
         const elapsed_seconds = Math.floor(
           (new Date().getTime() - createdAt) / 1000,
         );
-        console.log(elapsed_seconds);
         if (elapsed_seconds > 120) return;
         switch (event) {
           case 'JOBREQUEST':
@@ -42,12 +41,13 @@ export const subscribe_job_states = user => {
             }
             break;
           case 'PROJECTTIMEOUT':
-            await firebase_db.ref(`/jobalerts/${user.accountId}`).remove();
             store.dispatch(clientActions.expire_request());
             popPushNotification(
               `Delay in responding`,
               `A request sent earlier has expired before you responded. Kindly make sure you respond to any jenzi alert within a time span of less than a minute`,
             );
+            await firebase_db.ref(`/jobalerts/${user.accountId}`).remove();
+            break;
           default:
             return null;
         }

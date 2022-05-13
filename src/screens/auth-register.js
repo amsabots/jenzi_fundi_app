@@ -131,6 +131,7 @@ const Register = ({navigation}) => {
               />
             }
             placeholder="Phonenumber"
+            keyboardType="number-pad"
             onChangeText={txt => setEmail(txt)}
           />
           <TextInput

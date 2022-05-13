@@ -56,7 +56,7 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
       // update firebase records in the db
       await jobUtils.update_client(
         'REQUESTDECLINED',
-        selected_client.clientId,
+        user_data.user.accountId,
         client_request.requestId,
       );
     } catch (error) {
@@ -64,7 +64,6 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
     } finally {
       dispatch(clientActions.expire_request());
       toast.show({type: 'success', text1: 'Sent response to client'});
-      await jobUtils.delete_entry(user_data.user.accountId);
       dispatch(
         UISettingsActions.toggle_snack_bar(
           `Request has been cancelled successfully. Thank you for being our active member`,
@@ -85,7 +84,7 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
       // update client alert entries in firebase
       await jobUtils.update_client(
         'REQUESTACCEPTED',
-        selected_client.clientId,
+        user_data.user.accountId,
         client_request.requestId,
       );
       await AsyncStorage.setItem(
@@ -110,7 +109,6 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
       );
     } finally {
       dispatch(clientActions.expire_request());
-      await jobUtils.delete_entry(user_data.user.accountId);
     }
   };
 

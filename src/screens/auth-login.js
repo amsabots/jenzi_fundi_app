@@ -99,6 +99,7 @@ const Login = ({navigation}) => {
           </Text>
           <TextInput
             dense={true}
+            keyboardType="number-pad"
             activeUnderlineColor={COLORS.secondary}
             style={[styles._input_field, {backgroundColor: 'transparent'}]}
             left={
