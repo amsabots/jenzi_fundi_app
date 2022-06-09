@@ -42,7 +42,7 @@ const MainActivity = ({user_data}) => {
         dispatch(user_data_actions.create_user(JSON.parse(d)));
         if (d) {
           if (Object.keys(d_object).length > 0) {
-            subscribe_job_states(d_object);
+            subscribe_job_states(d_object, navigation);
             subscribe_to_chatrooms(d_object.accountId);
           }
           navigation.reset({

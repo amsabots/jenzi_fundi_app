@@ -87,17 +87,6 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
         user_data.user.accountId,
         client_request.requestId,
       );
-      await AsyncStorage.setItem(
-        offline_data.current_project_user,
-        JSON.stringify(selected_client),
-      );
-      dispatch(
-        UISettingsActions.toggle_snack_bar(
-          `Congratulations ${user_data.user.name}, new project has been initiated`,
-        ),
-      );
-      dispatch(chat_actions.active_chat(selected_client));
-      navigation.navigate(screens.conversation);
     } catch (error) {
       console.log(
         `[file: project-info.js] [action: accept response failed to reach destination] [message: ${error}]`,

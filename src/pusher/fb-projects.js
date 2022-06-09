@@ -2,7 +2,9 @@ import {endpoints, firebase_db} from '../endpoints';
 import {popPushNotification} from '../notifications';
 import axios from 'axios';
 import {store} from '../../App';
-import {clientActions} from '../store-actions';
+import {chat_actions, clientActions, UISettingsActions} from '../store-actions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {offline_data} from '../constants';
 
 const logger = console.log.bind(console, `[file: fb-projects.js]`);
 
@@ -12,7 +14,7 @@ const logger = console.log.bind(console, `[file: fb-projects.js]`);
 //   `A request came in while your device was offline or disconnected. Kindly keep you device on the line for alerts`,
 // );
 
-export const subscribe_job_states = user => {
+export const subscribe_job_states = (user, navigation) => {
   logger(`[message: The system has been bound to firebase job states channel]`);
   firebase_db
     .ref(`/jobalerts/${user.accountId}`)
@@ -26,7 +28,7 @@ export const subscribe_job_states = user => {
           (new Date().getTime() - createdAt) / 1000,
         );
         if (elapsed_seconds > 120) return;
-        switch (event) {
+        switch (event.trim()) {
           case 'JOBREQUEST':
             if (res.data) {
               const {payload, user} = res.data;
@@ -47,6 +49,19 @@ export const subscribe_job_states = user => {
               `A request sent earlier has expired before you responded. Kindly make sure you respond to any jenzi alert within a time span of less than a minute`,
             );
             await firebase_db.ref(`/jobalerts/${user.accountId}`).remove();
+            break;
+          case 'ACK':
+            await AsyncStorage.setItem(
+              offline_data.current_project_user,
+              JSON.stringify(selected_client),
+            );
+            store.dispatch(
+              UISettingsActions.toggle_snack_bar(
+                `Congratulations ${user_data.user.name}, new project has been initiated`,
+              ),
+            );
+            store.dispatch(chat_actions.active_chat(selected_client));
+            navigation.navigate(screens.conversation);
             break;
           default:
             return null;
