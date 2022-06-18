@@ -4,7 +4,7 @@ import axios from 'axios';
 import {store} from '../../App';
 import {chat_actions, clientActions, UISettingsActions} from '../store-actions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {offline_data} from '../constants';
+import {offline_data, screens} from '../constants';
 
 const logger = console.log.bind(console, `[file: fb-projects.js]`);
 
@@ -51,16 +51,23 @@ export const subscribe_job_states = (user, navigation) => {
             await firebase_db.ref(`/jobalerts/${user.accountId}`).remove();
             break;
           case 'ACK':
+            const {
+              clientsData: {selected_client},
+              user_data,
+            } = store.getState();
+            console.error('ACTIVE CLIENT ', store.getState().clientsData);
             await AsyncStorage.setItem(
               offline_data.current_project_user,
-              JSON.stringify(selected_client),
+              JSON.stringify(selected_client || {}),
             );
             store.dispatch(
               UISettingsActions.toggle_snack_bar(
                 `Congratulations ${user_data.user.name}, new project has been initiated`,
               ),
             );
-            store.dispatch(chat_actions.active_chat(selected_client));
+            await jobUtils.delete_entry(user.accountId);
+            store.dispatch(chat_actions.active_chat(selected_client || {}));
+            store.dispatch(clientActions.expire_request());
             navigation.navigate(screens.conversation);
             break;
           default:

@@ -91,13 +91,12 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
       console.log(
         `[file: project-info.js] [action: accept response failed to reach destination] [message: ${error}]`,
       );
+      dispatch(clientActions.expire_request());
       ToastAndroid.showWithGravity(
         'Project creation failed during initiation. Sorry for the inconvenience',
         ToastAndroid.LONG,
         ToastAndroid.CENTER,
       );
-    } finally {
-      dispatch(clientActions.expire_request());
     }
   };
 
