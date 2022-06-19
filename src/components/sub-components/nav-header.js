@@ -4,10 +4,7 @@ import {View, Text, StyleSheet, ImageBackground} from 'react-native';
 import {Button, useTheme} from 'react-native-paper';
 import {screens, theme} from '../../constants';
 import {COLORS, FONTS, SIZES} from '../../constants/themes';
-//
-import {Chip} from 'react-native-paper';
 
-//
 import {CircularImage} from '../circular-image';
 
 //redux
@@ -28,9 +25,13 @@ const NavHeaderView = ({navigation, user_data}) => {
   return (
     <View style={[styles.container]}>
       <CircularImage size={100} />
-      <Text style={[styles.color, styles.txt1]}>{user_data.user.name}</Text>
+      <Text style={[styles.color, styles.txt1]}>
+        {user_data?.user?.name || 'N/A'}
+      </Text>
       {/*  */}
-      <Text style={[styles.color, styles._email]}>{user_data.user.email}</Text>
+      <Text style={[styles.color, styles._email]}>
+        {user_data?.user?.username || 'N/A'}
+      </Text>
 
       <Button
         mode="contained"

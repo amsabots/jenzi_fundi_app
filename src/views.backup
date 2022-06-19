@@ -1,0 +1,62 @@
+ <Text style={styles._section_text}>Edit profile</Text>
+
+          <View style={[styles._section_card]}>
+            <TextInput
+              label={nm || 'Official Name'}
+              value={name}
+              onChangeText={text => setName(text)}
+              dense={true}
+              style={[styles._std_margin]}
+              activeOutlineColor={COLORS.secondary}
+              activeUnderlineColor={COLORS.secondary}
+              placeholder={nm}
+            />
+            <TextInput
+              label={phn || 'Phone number'}
+              value={phonenumber}
+              onChangeText={text => setPhonenumber(text)}
+              dense={true}
+              style={[styles._std_margin]}
+              activeUnderlineColor={COLORS.secondary}
+              placeholder={phn}
+            />
+            <View style={{marginVertical: SIZES.padding_12}}>
+              <AppRadioBtns
+                selected={engaged}
+                options={account_visibility}
+                onRadioButtonChangeListener={v => setEngaged(v)}
+              />
+            </View>
+            <Divider />
+            <View>
+              <AppRadioBtns
+                selected={active}
+                options={account_state}
+                onRadioButtonChangeListener={v => setActive(v)}
+              />
+            </View>
+
+            <View style={{marginTop: SIZES.padding_16}}>
+              <Button
+                mode="outlined"
+                icon="pencil"
+                color={COLORS.secondary}
+                onPress={handleEditsUpdate}>
+                Edit basic details
+              </Button>
+            </View>
+          </View>
+
+          {/* Section three - Tags */}
+          <Text style={styles._section_text}>Account customization</Text>
+
+          <View style={[styles._section_card]}>
+            <AccountCustomization user={user_data.user} />
+          </View>
+
+          {/* section three - password reset */}
+          <Text style={styles._section_text}>Password reset</Text>
+          <View style={[styles._section_card]}>
+            <ResetPassword user={user_data.user} />
+          </View>
+          {/* section three */}

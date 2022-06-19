@@ -14,6 +14,7 @@ import ProjectInfo from './project-info';
 import ConversationScreen from './conversation';
 import FundiReviews from './fundi-reviews-listing';
 import 'text-encoding-polyfill';
+import CategoriesPicker from './categories-picker';
 
 export {
   HomeView,
@@ -31,4 +32,5 @@ export {
   RateClient,
   ConversationScreen,
   FundiReviews,
+  CategoriesPicker,
 };

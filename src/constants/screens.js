@@ -17,6 +17,7 @@ const screens = {
   rate_client: 'rateClient',
   project_info: 'projectInfo',
   fundi_reviews: 'FUNDIREVIEWS',
+  profile_category_picker: 'profile_category_picker',
 };
 
 export {screens};

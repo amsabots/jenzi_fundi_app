@@ -15,8 +15,10 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {offline_data, screens} from '../constants';
-import {endpoints, errorMessage} from '../endpoints';
+import {axios_endpoint_error, endpoints, errorMessage} from '../endpoints';
 import {validation_schema} from '../config';
+
+axios.defaults.baseURL = `${endpoints.jenzi_backend}/jenzi/v1`;
 
 const Login = ({navigation}) => {
   // screen state
@@ -35,7 +37,7 @@ const Login = ({navigation}) => {
   const handleLogin = () => {
     if (!email || !password)
       return ToastAndroid.show(
-        'Email and password are required',
+        'Phone number and password are required',
         ToastAndroid.LONG,
       );
 
@@ -49,11 +51,12 @@ const Login = ({navigation}) => {
     }
     setLoading(true);
     axios
-      .post(`${endpoints.fundi_service}/accounts/login`, {
-        email: email.toLowerCase(),
+      .post(`/fundi/login`, {
+        username: email.toLowerCase(),
         password,
       })
       .then(async res => {
+        console.log(res.data);
         await AsyncStorage.setItem(offline_data.user, JSON.stringify(res.data));
         dispatch(user_data_actions.create_user(res.data));
         ToastAndroid.show('Welcome to Jenzi smart', ToastAndroid.LONG);
@@ -63,7 +66,7 @@ const Login = ({navigation}) => {
         });
       })
       .catch(err => {
-        errorMessage(err);
+        axios_endpoint_error(err);
       })
       .finally(() => {
         setLoading(false);
