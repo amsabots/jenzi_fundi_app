@@ -1,46 +1,30 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, {useState, useEffect, useRef, useMemo} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ActivityIndicator,
   InteractionManager,
-  ImageBackground,
-  Image,
+  ScrollView,
 } from 'react-native';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 import EnIcon from 'react-native-vector-icons/Entypo';
-import {
-  Divider,
-  Button,
-  Banner,
-  Chip,
-  Portal,
-  Dialog,
-  Card,
-} from 'react-native-paper';
-import storage from '@react-native-firebase/storage';
-import {
-  ClientDetails,
-  LoadingNothing,
-  InfoChips,
-  LoaderSpinner,
-  ImageSelector,
-  LoadingModal,
-} from '../components';
+import {Divider, Banner, Chip} from 'react-native-paper';
+import {ClientDetails, LoadingNothing, InfoChips} from '../components';
 
 //redux
 import {connect, useDispatch} from 'react-redux';
 import {UISettingsActions} from '../store-actions';
-import {ScrollView} from 'react-native-gesture-handler';
-
-//ui subcomponets
-import ProjectCancelOrDispute from './sub-components/task-action-reposnder';
 import moment from 'moment';
-
+import BottoSheet from '@gorhom/bottom-sheet';
 //icons
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
+//ui subcomponets
+import ProjectStateComplete from './sub-components/project-info-components/complete-project';
+import ProjectStateCancel from './sub-components/project-info-components/project-state-cancel';
+import ProjectStateDispute from './sub-components/project-info-components/project-state-dispute';
+//////
 const mapStateToProps = state => {
   const {user_data} = state;
   return {user_data};
@@ -62,36 +46,56 @@ const SectionTitle = ({label}) => {
 const ProjectInfo = ({navigation, user_data, route}) => {
   //component state variables
   const [ready, setIsReady] = useState(false);
-  const [confirmAction, setConfirmAction] = useState(false);
-  const [sheetActionType, setSheetActionType] = useState('');
-  const [images_to_upload, setImagesToUpload] = useState(null);
-
-  // variable and builder components
-  const sheetRef = useRef();
-  const image_selector_ref = useRef();
-
+  const [sheet_state_children, set_sheet_state_children] = useState(null);
   const {item} = route.params;
-  const {item: obj, taskDetails} = item;
+  const {item: project_info, client_info} = item;
+  //prettier-ignore
+  const {task_state, title, requirements, task_id, task_info, createdAt, completion_data, clientId} = project_info;
+  //prettier-ignore
+  const {state, conflict_flag, conflict_flag_info, fore_ground_color, back_ground_color, 
+    createdAt:created_time} = project_info.fundi_data
+  // bottom sheet
+  const snapPoints = useMemo(() => [0, '50%', '85%'], []);
+  const bottom_sheet = useRef(null);
 
-  const handleSheetOpenRequest = type => {
-    setSheetActionType(type);
-    sheetRef.current.snapTo(1);
+  const dismiss_sheet = () => {
+    bottom_sheet.current.snapTo(0);
   };
 
-  function update_job_entry() {}
+  const handle_state_prompt = state => {
+    bottom_sheet.current.snapTo(1);
+    if (state === 'complete') {
+      set_sheet_state_children(
+        <ProjectStateComplete
+          close_bottom_sheet={dismiss_sheet}
+          project_info={project_info.fundi_data}
+          user_info={user_data.user}
+        />,
+      );
+    } else if (state === 'cancel') {
+      set_sheet_state_children(
+        <ProjectStateCancel
+          close_bottom_sheet={dismiss_sheet}
+          project_info={project_info.fundi_data}
+          user_info={user_data.user}
+        />,
+      );
+    } else if (state === 'dispute') {
+      set_sheet_state_children(
+        <ProjectStateDispute
+          close_bottom_sheet={dismiss_sheet}
+          project_info={project_info.fundi_data}
+          user_info={user_data.user}
+        />,
+      );
+    }
+  };
 
   //component hooks
   const dispatch = useDispatch();
-
-  //component event handlers
-  const handleActionChange = () => {
-    setConfirmAction(true);
-  };
-
   //use effect hooks
   useEffect(() => {
     dispatch(UISettingsActions.status_bar(false));
-
     InteractionManager.runAfterInteractions(() => {
       setIsReady(true);
     });
@@ -99,8 +103,8 @@ const ProjectInfo = ({navigation, user_data, route}) => {
   return !ready ? (
     <ActivityIndicator size={SIZES.padding_32} color={COLORS.secondary} />
   ) : (
-    <>
-      <ScrollView style={styles.container}>
+    <View style={styles.container}>
+      <ScrollView>
         <EnIcon
           name="cross"
           size={SIZES.padding_32}
@@ -110,7 +114,7 @@ const ProjectInfo = ({navigation, user_data, route}) => {
         />
         {/* ===========   PAGE CLIENT DETAILS ============= */}
 
-        <ClientDetails client_details={taskDetails.client} />
+        <ClientDetails client_details={client_info} />
         {/*  ========== PAGE PROJECT INFO ================= */}
         <Text
           style={{
@@ -127,7 +131,7 @@ const ProjectInfo = ({navigation, user_data, route}) => {
             visible={true}
             contentStyle={{backgroundColor: COLORS.light_secondary}}>
             <Text style={{color: COLORS.secondary, ...FONTS.caption}}>
-              {obj?.message ||
+              {conflict_flag_info ||
                 ' Any special information about the project will appear here - Keep note'}
             </Text>
           </Banner>
@@ -135,7 +139,7 @@ const ProjectInfo = ({navigation, user_data, route}) => {
           <View style={{marginTop: SIZES.padding_16}}>
             <SectionTitle label=" Project title:" />
             <Text style={{color: COLORS.secondary, ...FONTS.body_medium}}>
-              {taskDetails.title}
+              {title}
             </Text>
             <Divider style={{marginVertical: SIZES.padding_12}} />
             {/* ======= REQUIREMENTS AND SHIT ============== */}
@@ -152,166 +156,60 @@ const ProjectInfo = ({navigation, user_data, route}) => {
             {/* ========== TASK STATE AND TIMELINE =========== */}
             <SectionTitle label="Extra info:" />
             <View style={styles._extra_info}>
-              <InfoChips
-                text={obj.projectStatus}
-                textColor={obj.foregroundIdColor}
-              />
+              <InfoChips text={state} textColor={fore_ground_color} />
               <View style={{marginHorizontal: SIZES.padding_4}}>
                 <InfoChips
-                  text={`Client - ${taskDetails.taskState}`}
+                  text={`Client - ${task_state.toLowerCase()}`}
                   textColor={COLORS.primary}
                 />
               </View>
               <Text style={{...FONTS.caption}}>
-                Posted: {moment(obj.createdAt).fromNow()}
+                Posted: {moment(created_time).fromNow()}
               </Text>
             </View>
             {/* ============= ACTIONS - BUTTONS AND SHIT ========== */}
             <Divider style={{marginVertical: SIZES.padding_12}} />
-            {/* ========== PROJECT IMAGES AND FILES =========== */}
-
-            <FundiImageFiles
-              projectId={item}
-              sheetRef={image_selector_ref}
-              pickedFiles={images_to_upload}
-            />
-
             {/* ==============  Action Section and shit ========= */}
+            <Divider
+              style={{
+                marginVertical: SIZES.padding_16,
+                backgroundColor: COLORS.blue_deep,
+              }}
+            />
             <SectionTitle label="Actions:" />
             <View style={styles._action_btn}>
               <Chip
                 style={{backgroundColor: COLORS.secondary}}
-                onPress={handleActionChange}>
+                onPress={() => handle_state_prompt('complete')}>
                 <Text style={{color: COLORS.white, ...FONTS.caption}}>
-                  Complete
+                  Complete {'&'} close
                 </Text>
               </Chip>
               <Chip
                 style={{
                   backgroundColor: COLORS.primary,
                   marginHorizontal: SIZES.padding_4,
-                }}
-                onPress={() => handleSheetOpenRequest('DISPUTE')}>
-                <Text style={{color: COLORS.white, ...FONTS.caption}}>
+                }}>
+                <Text
+                  style={{color: COLORS.white, ...FONTS.caption}}
+                  onPress={() => handle_state_prompt('dispute')}>
                   Raise dispute
                 </Text>
               </Chip>
               <Chip
                 style={{backgroundColor: COLORS.blue_deep}}
-                onPress={() => handleSheetOpenRequest('CANCEL')}>
+                onPress={() => handle_state_prompt('cancel')}>
                 <Text style={{color: COLORS.white, ...FONTS.caption}}>
                   Cancel
                 </Text>
               </Chip>
             </View>
           </View>
-          <ImageSelector
-            sheetRef={image_selector_ref}
-            onRequestClose={() => image_selector_ref.current.snapTo(0)}
-            onImagesPicked={imgs => setImagesToUpload(imgs)}
-            selectMultiple={true}
-          />
         </View>
       </ScrollView>
-
-      {/* ======== NON STACKABLE COMPONENTS */}
-      {/* ======== CANCEL OR RAISE DISPUTE ======= */}
-      <ProjectCancelOrDispute
-        sheetRef={sheetRef}
-        job_item={item}
-        type={sheetActionType}
-        dismissListener={() => sheetRef.current.snapTo(0)}
-      />
-      {/* ======== COMPLETE PROJECT =========== */}
-      <Portal>
-        <Dialog
-          visible={confirmAction}
-          onDismiss={() => setConfirmAction(false)}>
-          <Dialog.Title>Confirm action change</Dialog.Title>
-          <Dialog.Content>
-            <Text>
-              Please confirm that you want to change the job state to complete.
-              We will send an alert to the client to confirm or decline your
-              request
-            </Text>
-            <Divider style={{marginTop: SIZES.padding_16}} />
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Button onPress={() => setConfirmAction(false)}>Cancel</Button>
-              <Button color={COLORS.secondary} onPress={() => update_job_entry}>
-                Complete
-              </Button>
-            </View>
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
-    </>
-  );
-};
-
-async function getPathForFirebaseStorage(uri) {
-  const stat = await RNFetchBlob.fs.stat(uri);
-  return stat.path;
-}
-
-const FundiImageFiles = ({projectId, sheetRef, pickedFiles}) => {
-  const [images, setImages] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-  const [fetch, setFetching] = useState(false);
-  const [upload, setUpload] = useState(false);
-
-  const reference = storage().ref(`fundis-projects`);
-
-  if (fetch)
-    return (
-      <View style={{alignItems: 'center'}}>
-        <LoaderSpinner.Wave height={70} width={70} />
-      </View>
-    );
-  return (
-    <View>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          marginVertical: SIZES.padding_16,
-        }}>
-        <Text style={{...FONTS.captionBold}}>Project Images</Text>
-        <AntDesign
-          name="addfile"
-          size={SIZES.icon_size}
-          color={COLORS.secondary}
-          onPress={() => sheetRef.current.snapTo(2)}
-        />
-      </View>
-      {!images.length ? (
-        <LoadingNothing
-          label={'No images for this project'}
-          height={50}
-          width={50}
-        />
-      ) : (
-        <ScrollView horizontal={true}>
-          {images.map((el, idx) => {
-            return (
-              <Card
-                style={{marginRight: SIZES.base, borderRadius: SIZES.base}}
-                key={idx}>
-                <Image
-                  source={require('../assets/profile.png')}
-                  defaultSource={require('../assets/profile.png')}
-                  style={styles._project_image_file}
-                />
-                <Text style={styles._img_caption}>Some nice caption</Text>
-              </Card>
-            );
-          })}
-        </ScrollView>
-      )}
-      <LoadingModal
-        onDismiss={() => setUpload(false)}
-        show={upload}
-        label={'Uplaoding files.......'}
-      />
+      <BottoSheet snapPoints={snapPoints} ref={bottom_sheet}>
+        {sheet_state_children && sheet_state_children}
+      </BottoSheet>
     </View>
   );
 };

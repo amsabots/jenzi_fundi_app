@@ -1,13 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  ScrollView,
-  ToastAndroid,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import {ProgressBar} from 'react-native-paper';
 // redux store
 import {UISettingsActions} from '../store-actions/ui-settings';
 import {connect, useDispatch} from 'react-redux';
@@ -25,11 +18,9 @@ import {
 
 //sub components UI builders
 import axios from 'axios';
-import {endpoints, errorMessage} from '../endpoints';
-import {task_actions} from '../store-actions/task-actions';
+import {endpoints, axios_endpoint_error} from '../endpoints';
 import {screens} from '../constants';
 import moment from 'moment';
-
 //
 
 export const NothingToShow = (
@@ -46,37 +37,34 @@ const LoaderView = (
     <Text>Fetching projects......</Text>
   </View>
 );
-
+axios.defaults.baseURL = endpoints.jenzi_backend + '/jenzi/v1';
 // project item - for the flatlist
 const ProjectItem = ({onItemClick, item}) => {
-  const {
-    taskId,
-    createdAt,
-    projectStatus,
-    foregroundIdColor,
-    backgroundIdColor,
-  } = item;
-  const [taskDetails, setTaskDetails] = useState({});
+  //prettier-ignore
+  const {task_state, title, requirements, task_id, task_info, createdAt, completion_data, clientId} = item;
+  //prettier-ignore
+  const {state, conflict_flag, conflict_flag_info, fore_ground_color, back_ground_color, 
+    createdAt:created_time} = item.fundi_data
+  //
+  const [client_info, set_client_info] = useState(null);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`${endpoints.client_service}/jobs/${taskId}`)
-      .then(res => {
-        setTaskDetails(res.data);
-      })
-      .catch(er => setTaskDetails(null))
+      .get(`/clients/${clientId}`)
+      .then(res => set_client_info(res.data))
       .finally(() => setLoading(false));
-  }, []);
+    return () => {
+      setLoading(false);
+    };
+  }, [item]);
   const task_state_color = task_state => {
     switch (task_state) {
       case 'ONGOING':
         return COLORS.blue_deep;
-      case 'PENDING_CONFIRMATION':
       case 'COMPLETE':
         return COLORS.secondary;
-      case 'DISPUTE_PENDING':
-      case 'DISPUTE_COMPLETE':
+      case 'CANCELLED':
         return COLORS.grey_dark;
       default:
         return COLORS.primary;
@@ -85,40 +73,43 @@ const ProjectItem = ({onItemClick, item}) => {
   return (
     <TouchableOpacity
       activeOpacity={0.9}
-      style={[styles._item_card, {borderLeftColor: foregroundIdColor}]}
-      onPress={() => onItemClick({item, taskDetails})}>
-      <View style={styles._project_state}>
-        <View>
-          <Text style={{...FONTS.caption, marginBottom: 4}}>
-            Your project status
-          </Text>
-          <InfoChips text={projectStatus} textColor={COLORS.secondary} />
+      style={[styles._item_card, {borderLeftColor: fore_ground_color}]}
+      onPress={() => onItemClick({item, client_info})}>
+      {loading && <ProgressBar indeterminate color={COLORS.blue_deep} />}
+      <View style={styles._item_content_wrapper}>
+        <View style={styles._project_state}>
+          <View>
+            <Text style={{...FONTS.caption, marginBottom: 4}}>
+              Local project status
+            </Text>
+            <InfoChips text={state} textColor={COLORS.secondary} />
+          </View>
+          {/* ======== left fundi state */}
+          <View>
+            <Text style={{...FONTS.caption, marginBottom: 4}}>
+              Client side state
+            </Text>
+            <InfoChips text={task_state} textColor={COLORS.primary} />
+          </View>
         </View>
-        {/* ======== left fundi state */}
-        <View>
-          <Text style={{...FONTS.caption, marginBottom: 4}}>
-            Client side state
-          </Text>
-          <InfoChips text={taskDetails.taskState} textColor={COLORS.primary} />
-        </View>
-      </View>
-      {/* =========== END OF PROJECT STATE ======== */}
-      <Text style={{...FONTS.body_bold, marginTop: SIZES.base}}>
-        {taskDetails.title || 'Not Available'}
-      </Text>
-      <View style={styles._card_timeline}>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <IonIcons name="time-outline" size={SIZES.padding_16} />
-          <Text style={{...FONTS.caption, marginLeft: SIZES.base}}>
-            {moment(createdAt).fromNow(false)}
-          </Text>
-        </View>
-        {/* ==== */}
-        <View>
-          <CircularImage size={24} />
-          <Text style={{...FONTS.captionBold, color: backgroundIdColor}}>
-            {taskDetails?.client?.name}
-          </Text>
+        {/* =========== END OF PROJECT STATE ======== */}
+        <Text style={{...FONTS.body_bold, marginTop: SIZES.base}}>
+          {title || 'Not Available'}
+        </Text>
+        <View style={styles._card_timeline}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <IonIcons name="time-outline" size={SIZES.padding_16} />
+            <Text style={{...FONTS.caption, marginLeft: SIZES.base}}>
+              {moment(created_time).fromNow(false)}
+            </Text>
+          </View>
+          {/* ==== */}
+          <View style={{alignItems: 'center'}}>
+            <CircularImage size={24} />
+            <Text style={{...FONTS.captionBold, color: back_ground_color}}>
+              {client_info?.name || 'N/A'}
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -129,31 +120,24 @@ const ProjectItem = ({onItemClick, item}) => {
  * =================== Main Component =================
  */
 const Projects = ({tasks, navigation, user_data}) => {
-  const {jobs, posted_jobs} = tasks;
   const {user} = user_data;
   //set project variables
   const [loading, setLoading] = useState(true);
+  const [jobs, set_jobs] = useState([]);
   //redux
   const dispatch = useDispatch();
   //render project item
   const load_jobs = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${endpoints.fundi_service}/projects/${user.id}?page=0&pageSize=20`,
-        {timeout: 7000},
-      );
-      const {data} = res.data;
-      if (data.length) dispatch(task_actions.load_jobs(data));
-    } catch (error) {
-      ToastAndroid.showWithGravity(
-        'Serivice unavailable',
-        ToastAndroid.SHORT,
-        ToastAndroid.TOP,
-      );
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    axios
+      .get(`/fundi-tasks/user/${user.id}`)
+      .then(res => {
+        const {page, limit, data} = res.data;
+        const {fundi_data} = data;
+        if (data.length) set_jobs(data);
+      })
+      .catch(err => axios_endpoint_error(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -161,30 +145,38 @@ const Projects = ({tasks, navigation, user_data}) => {
   }, []);
 
   if (loading) return LoaderView;
-  if (!jobs.length) return NothingToShow;
-
   return (
     <View style={styles.container}>
-      <DefaultToolBar title="Project Listing" navigation={navigation} />
-      <View style={styles._content_wrapper}>
-        <FlatList
-          data={jobs}
-          showsVerticalScrollIndicator={false}
-          refreshing={loading}
-          onRefresh={() => load_jobs()}
-          keyExtractor={item => item.id}
-          renderItem={({item}) => {
-            return (
-              <ProjectItem
-                item={item}
-                onItemClick={item =>
-                  navigation.navigate(screens.project_info, {item})
-                }
-              />
-            );
-          }}
-        />
-      </View>
+      <DefaultToolBar
+        title="Project Listing"
+        navigation={navigation}
+        refresh={true}
+        onRefreshClicked={() => load_jobs()}
+      />
+
+      {!jobs.length ? (
+        NothingToShow
+      ) : (
+        <View style={styles._content_wrapper}>
+          <FlatList
+            data={jobs}
+            showsVerticalScrollIndicator={false}
+            refreshing={loading}
+            onRefresh={() => load_jobs()}
+            keyExtractor={item => item.id}
+            renderItem={({item}) => {
+              return (
+                <ProjectItem
+                  item={item}
+                  onItemClick={item =>
+                    navigation.navigate(screens.project_info, {item})
+                  }
+                />
+              );
+            }}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -201,10 +193,8 @@ const styles = StyleSheet.create({
   _item_card: {
     backgroundColor: COLORS.white,
     borderRadius: SIZES.base,
-    marginHorizontal: SIZES.base,
-    marginBottom: SIZES.base,
     borderLeftWidth: SIZES.base,
-    padding: SIZES.padding_16,
+    marginBottom: SIZES.base,
   },
   _content_wrapper: {
     flex: 1,
@@ -219,6 +209,9 @@ const styles = StyleSheet.create({
   _project_state: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  _item_content_wrapper: {
+    padding: SIZES.padding_16,
   },
 });
 

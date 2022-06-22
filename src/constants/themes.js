@@ -15,6 +15,7 @@ export const COLORS = {
   info: '#56B653',
   info_light: '#F0563610',
   light_green: '#56B65315',
+  green: '#56B653',
   danger: '#F23C3D',
   transparent: '#ffffff00',
   blue_deep: '#5e69f7',
