@@ -16,6 +16,7 @@ import FundiReviews from './fundi-reviews-listing';
 import 'text-encoding-polyfill';
 import CategoriesPicker from './categories-picker';
 import BasicInfoScreen from './profile-basic-info';
+import passwordReset from './profile-password-reset';
 
 export {
   HomeView,
@@ -35,4 +36,5 @@ export {
   FundiReviews,
   CategoriesPicker,
   BasicInfoScreen,
+  passwordReset,
 };

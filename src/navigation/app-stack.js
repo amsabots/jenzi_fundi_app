@@ -15,6 +15,7 @@ import {
   ConversationScreen,
   FundiReviews,
   CategoriesPicker,
+  passwordReset,
   BasicInfoScreen,
 } from '../screens';
 import {screens} from '../constants/screens';
@@ -118,6 +119,7 @@ const AppDrawerNavigator = () => {
         name={screens.profile_basic_info}
         component={BasicInfoScreen}
       />
+      <Stack.Screen name={screens.reset_pass} component={passwordReset} />
     </Stack.Navigator>
   );
 };

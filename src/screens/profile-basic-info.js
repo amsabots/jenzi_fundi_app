@@ -17,7 +17,8 @@ const mapStateToProps = state => {
   return {user_data};
 };
 
-export const CustomTextInputView = ({name, value, onTextChange, label}) => {
+//prettier-ignore
+export const CustomTextInputView = ({name, value, onTextChange, label, ...otherprops}) => {
   return (
     <TextInput
       value={value}
@@ -29,6 +30,7 @@ export const CustomTextInputView = ({name, value, onTextChange, label}) => {
       dense={true}
       label={label}
       mode={'outlined'}
+      {...otherprops}
       onChangeText={txt => onTextChange({[name]: txt})}
     />
   );

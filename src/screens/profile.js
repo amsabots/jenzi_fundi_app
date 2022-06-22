@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {Caption, Divider} from 'react-native-paper';
+import {Caption, Divider, Switch} from 'react-native-paper';
 import {ScrollView} from 'react-native-gesture-handler';
 
 //toast
@@ -69,15 +69,11 @@ const Profile = ({navigation, user_data}) => {
   const {is_enabled, email: em, name: nm, username: phn, verified: ve} = user;
   // ui variables - transient
   const [showLoader, setShowModal] = useState(false);
-
-  // referential variables - external behaviour
-  const img_selector = useRef(null);
-
-  // redux store
-  const dispatch = useDispatch();
-
+  const [account_status, set_account_status] = useState(is_enabled);
   //===================== component functions ===========
-
+  const handle_account_status_change = () => {
+    set_account_status(!account_status);
+  };
   return (
     <>
       {/* toolbar */}
@@ -129,7 +125,7 @@ const Profile = ({navigation, user_data}) => {
           <ProfileMenuItem
             icon={'eye'}
             label={'Password manager'}
-            navigateTo={screens.profile_category_picker}
+            navigateTo={screens.reset_pass}
             navigation={navigation}
           />
           <ProfileMenuItem
@@ -139,6 +135,16 @@ const Profile = ({navigation, user_data}) => {
             navigation={navigation}
           />
         </ScrollView>
+        <View style={styles._buttom_section}>
+          <Text style={{...FONTS.caption, color: COLORS.white}}>
+            {account_status ? 'Take account offline' : 'Get back online'}
+          </Text>
+          <Switch
+            value={account_status}
+            onValueChange={handle_account_status_change}
+            color={COLORS.white}
+          />
+        </View>
       </View>
     </>
   );
@@ -178,6 +184,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+  },
+  _buttom_section: {
+    backgroundColor: COLORS.blue_deep,
+    width: '100%',
+    minHeight: 30,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SIZES.padding_16,
   },
 });
 
