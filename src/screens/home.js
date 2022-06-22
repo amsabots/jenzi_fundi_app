@@ -8,7 +8,7 @@ import {offline_data} from '../constants';
 
 // redux store
 import {useDispatch, connect} from 'react-redux';
-import {chat_actions, task_actions, UISettingsActions} from '../store-actions';
+import {chat_actions, UISettingsActions} from '../store-actions';
 
 //components
 import {COLORS, FONTS, SIZES} from '../constants/themes';
@@ -20,14 +20,17 @@ import {screens} from '../constants';
 import EvilCons from 'react-native-vector-icons/EvilIcons';
 import IoIcons from 'react-native-vector-icons/Ionicons';
 import ProjectAlert from './sub-components/project-info';
-import {LoaderSpinner, LoadingNothing} from '../components';
-import {Chip, Divider, Card} from 'react-native-paper';
+import {LoaderSpinner} from '../components';
+import {Chip, Divider, Card, ProgressBar} from 'react-native-paper';
 // sub view components
 import {
   HomeSummaryInfo,
   AccountStarRating,
 } from './sub-components/home-summary-info';
 import {chats} from '../../store/chats';
+import axios from 'axios';
+import {endpoints} from '../endpoints';
+axios.defaults.baseURL = endpoints.jenzi_backend + `/jenzi/v1`;
 
 const logger = console.log.bind(console, '[home.js: Home screen] ');
 
@@ -49,6 +52,9 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
   // component state variables
   const [load, setLoad] = useState(false);
   const [activeClient, setActiveClient] = useState({});
+  const [project, set_project] = useState(0);
+  const [completed_projects, set_completed_projects] = useState(0);
+  const [reviews, set_reviews] = useState(0);
 
   const fetch_from_offline = async () => {
     const client = await AsyncStorage.getItem(
@@ -79,10 +85,28 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
 
   const dispatch = useDispatch();
 
+  // UI data pipeline
+  const fetch_latest_user_profile_ui_data = () => {
+    setLoad(true);
+    axios
+      .get(`/fundi-tasks/user/${user.id}`)
+      .then(res => res.data.data)
+      .then(async res => {
+        const {data: reviews_data} = await axios.get(
+          `/fundi-reviews/fundi/${user.id}`,
+        );
+        set_project(res);
+        const completed = res.filter(el => el.state === 'Complete');
+        set_completed_projects(completed);
+        set_reviews(reviews_data.data);
+      })
+      .finally(() => setLoad(false));
+  };
+
   //run on the first screen render
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', backButtonHandler);
-    //connect to job state channel
+    //update home UI
     return () => {
       setLoad(false);
     };
@@ -97,6 +121,7 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
       if (!user.latitude) navigation.navigate(screens.location_picker);
       dispatch(UISettingsActions.status_bar(false));
       fetch_from_offline();
+      fetch_latest_user_profile_ui_data();
       return () => {
         BackHandler.removeEventListener('hardwareBackPress', backButtonHandler);
         setLoad(false);
@@ -133,6 +158,13 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
           Your account profile is public
         </Text>
       </View>
+      {load && (
+        <ProgressBar
+          color={COLORS.secondary}
+          style={{width: '100%'}}
+          indeterminate
+        />
+      )}
       {/* ============ CONTENT AREA ================= */}
       <View style={styles.content}>
         {Object.keys(activeClient || {}).length ? (
@@ -173,7 +205,9 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
               Total projects
             </Text>
             <View style={styles._details_value}>
-              <Text style={styles._details_value_txt}>0</Text>
+              <Text style={styles._details_value_txt}>
+                {project.length || 0}
+              </Text>
             </View>
           </Card>
           <Card
@@ -187,14 +221,20 @@ const Home = memo(({navigation, user_data, clientsData, tasks}) => {
               Completed
             </Text>
             <View style={styles._details_value}>
-              <Text style={styles._details_value_txt}>0</Text>
+              <Text style={styles._details_value_txt}>
+                {completed_projects.length || 0}
+              </Text>
             </View>
           </Card>
         </View>
         {/* ============== END OF THE PROJECTS SUMMARY INFO ============ */}
         <HomeSummaryInfo />
         <Divider />
-        <AccountStarRating navigation={navigation} />
+        <AccountStarRating
+          navigation={navigation}
+          reviews={reviews}
+          user={user}
+        />
       </View>
       <ProjectAlert navigation={navigation} />
     </View>

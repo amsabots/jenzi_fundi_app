@@ -27,12 +27,13 @@ const HomeSummaryInfo = ({user}) => {
   );
 };
 
-const AccountStarRating = ({navigation}) => {
+const AccountStarRating = ({navigation, reviews, user}) => {
   return (
     <>
       <Text style={{marginTop: SIZES.padding_16, ...FONTS.body_medium}}>
         Rating {'&'} Reviews
       </Text>
+
       <View style={styles.account_star_rating}>
         <View>
           <Rating
@@ -43,18 +44,20 @@ const AccountStarRating = ({navigation}) => {
             startingValue={0}
             readonly={true}
           />
-          <Text style={styles._rating_caption}>0 Stars</Text>
+          <Text style={styles._rating_caption}>{user?.rating ?? 0} Stars</Text>
         </View>
         {/*  review section */}
         <View>
-          <Text style={styles._rating_caption}>0 Reviews</Text>
+          <Text style={styles._rating_caption}>{reviews.length} Reviews</Text>
           <Chip
             style={{
               backgroundColor: COLORS.secondary,
               marginLeft: SIZES.base,
               marginTop: SIZES.padding_4,
             }}
-            onPress={() => navigation.navigate(screens.fundi_reviews)}>
+            onPress={() =>
+              navigation.navigate(screens.fundi_reviews, {reviews})
+            }>
             <Text style={{...FONTS.caption, color: COLORS.white}}>
               View Reviews
             </Text>
