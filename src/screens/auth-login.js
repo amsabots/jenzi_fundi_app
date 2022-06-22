@@ -7,7 +7,7 @@ import {useDispatch} from 'react-redux';
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 import {UISettingsActions, user_data_actions} from '../store-actions';
 
-import {LoaderSpinner, LoadingNothing} from '../components';
+import {LoadingNothing} from '../components';
 import {TextInput, Button} from 'react-native-paper';
 //axios network request
 import axios from 'axios';

@@ -13,7 +13,6 @@ export const firebase_db = firebase.app().database(endpoints.firebase_database);
 
 export const errorMessage = err => {
   if (err.response) {
-    const {data, status} = err.response;
     console.log(data);
     Toast.show({
       type: 'error',
@@ -37,10 +36,13 @@ export const errorMessage = err => {
 export const axios_endpoint_error = error => {
   if (error?.response) {
     console.log(error.response.data);
+    let err = error.response.data;
+    //prettier-ignore
+    err = Object.keys(error).length || error.length > 20 ? "Error processing your request": err
     Toast.show({
       type: 'error',
       text1: 'Request Error',
-      text2: `${error?.response?.data}`,
+      text2: `${err}`,
       position: 'bottom',
     });
   } else {

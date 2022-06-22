@@ -18,6 +18,8 @@ const screens = {
   project_info: 'projectInfo',
   fundi_reviews: 'FUNDIREVIEWS',
   profile_category_picker: 'profile_category_picker',
+  profile_basic_info: `Profile_basic_info`,
+  profile_reset_password: `profile_reset_password`,
 };
 
 export {screens};

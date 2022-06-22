@@ -15,6 +15,7 @@ import {
   ConversationScreen,
   FundiReviews,
   CategoriesPicker,
+  BasicInfoScreen,
 } from '../screens';
 import {screens} from '../constants/screens';
 //navigation components
@@ -112,6 +113,10 @@ const AppDrawerNavigator = () => {
       <Stack.Screen
         name={screens.conversation}
         component={ConversationScreen}
+      />
+      <Stack.Screen
+        name={screens.profile_basic_info}
+        component={BasicInfoScreen}
       />
     </Stack.Navigator>
   );

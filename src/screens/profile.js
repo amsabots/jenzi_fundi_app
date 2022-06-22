@@ -111,7 +111,7 @@ const Profile = ({navigation, user_data}) => {
           <ProfileMenuItem
             icon={'user'}
             label={'Basic Info'}
-            navigateTo={screens.profile_category_picker}
+            navigateTo={screens.profile_basic_info}
             navigation={navigation}
           />
           <ProfileMenuItem

@@ -15,6 +15,7 @@ import ConversationScreen from './conversation';
 import FundiReviews from './fundi-reviews-listing';
 import 'text-encoding-polyfill';
 import CategoriesPicker from './categories-picker';
+import BasicInfoScreen from './profile-basic-info';
 
 export {
   HomeView,
@@ -33,4 +34,5 @@ export {
   ConversationScreen,
   FundiReviews,
   CategoriesPicker,
+  BasicInfoScreen,
 };
