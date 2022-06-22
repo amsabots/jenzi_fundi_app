@@ -33,7 +33,6 @@ const AccountStarRating = ({navigation, reviews, user}) => {
       <Text style={{marginTop: SIZES.padding_16, ...FONTS.body_medium}}>
         Rating {'&'} Reviews
       </Text>
-
       <View style={styles.account_star_rating}>
         <View>
           <Rating
