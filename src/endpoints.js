@@ -38,7 +38,7 @@ export const axios_endpoint_error = error => {
     console.log(error.response.data);
     let err = error.response.data;
     //prettier-ignore
-    err = Object.keys(error).length || error.length > 20 ? "Error processing your request": err
+    err = typeof err !=="string" || err.length > 70 ? "Error processing your request": err
     Toast.show({
       type: 'error',
       text1: 'Request Error',

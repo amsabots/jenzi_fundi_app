@@ -27,7 +27,6 @@ import {
   HomeSummaryInfo,
   AccountStarRating,
 } from './sub-components/home-summary-info';
-import {chats} from '../../store/chats';
 import axios from 'axios';
 import {endpoints} from '../endpoints';
 axios.defaults.baseURL = endpoints.jenzi_backend + `/jenzi/v1`;

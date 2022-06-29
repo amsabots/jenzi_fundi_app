@@ -43,7 +43,7 @@ const MainActivity = ({user_data}) => {
         if (d) {
           if (Object.keys(d_object).length > 0) {
             subscribe_job_states(d_object, navigation);
-            subscribe_to_chatrooms(d_object.accountId);
+            subscribe_to_chatrooms(d_object.account_id);
           }
           navigation.reset({
             index: 0,

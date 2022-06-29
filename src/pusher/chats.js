@@ -2,7 +2,7 @@ import {store} from '../../App';
 import {endpoints, firebase_db} from '../endpoints';
 import {chat_actions} from '../store-actions';
 import axios from 'axios';
-axios.defaults.baseURL = endpoints.client_service;
+axios.defaults.baseURL = endpoints.jenzi_backend + '/jenzi/v1';
 
 const logger = console.log.bind(console, `[file: chats.js]`);
 

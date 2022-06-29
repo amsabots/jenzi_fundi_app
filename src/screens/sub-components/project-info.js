@@ -56,7 +56,7 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
       // update firebase records in the db
       await jobUtils.update_client(
         'REQUESTDECLINED',
-        user_data.user.accountId,
+        user_data.user.account_id,
         client_request.requestId,
       );
     } catch (error) {
@@ -84,7 +84,7 @@ const ProjectAlert = ({tasks, user_data, clientsData, navigation}) => {
       // update client alert entries in firebase
       await jobUtils.update_client(
         'REQUESTACCEPTED',
-        user_data.user.accountId,
+        user_data.user.account_id,
         client_request.requestId,
       );
     } catch (error) {
