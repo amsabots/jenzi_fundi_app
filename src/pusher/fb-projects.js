@@ -1,4 +1,4 @@
-import {endpoints, firebase_db} from '../endpoints';
+import {axios_endpoint_error, endpoints, firebase_db} from '../endpoints';
 import {popPushNotification} from '../notifications';
 import axios from 'axios';
 import {store} from '../../App';
@@ -70,15 +70,23 @@ export const subscribe_job_states = (user, navigation) => {
             ),
           );
           // take the user offline till further notice
-          await axios.put(
-            `${endpoints.jenzi_backend}/jenzi/v1/fundi/${user.id}`,
-            {is_enabled: false},
-          );
-          update_user_info(user.id);
-          await jobUtils.delete_entry(user.account_id);
-          store.dispatch(chat_actions.active_chat(selected_client || {}));
-          store.dispatch(clientActions.expire_request());
-          navigation.navigate(screens.conversation);
+          axios
+            .put(`${endpoints.jenzi_backend}/jenzi/v1/fundi/${user.id}`, {
+              is_enabled: false,
+            })
+            .then(async res => {
+              update_user_info(user.id);
+              await jobUtils.delete_entry(user.account_id);
+              store.dispatch(chat_actions.active_chat(selected_client || {}));
+              navigation.navigate(screens.conversation);
+            })
+            .catch(er => {
+              axios_endpoint_error(er);
+            })
+            .finally(() => {
+              store.dispatch(clientActions.expire_request());
+            });
+
           break;
         default:
           return null;
