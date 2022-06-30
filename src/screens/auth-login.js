@@ -85,7 +85,7 @@ const Login = ({navigation}) => {
               ...FONTS.h4,
               marginTop: SIZES.padding_16,
             }}>
-            JENZI SMART
+            JENZI PRO
           </Text>
         </View>
 

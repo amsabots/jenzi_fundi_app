@@ -29,7 +29,7 @@ const RestPassword = ({navigation}) => {
     <ScrollView style={{backgroundColor: COLORS.white}}>
       <View style={styles.container}>
         <View>
-          <LoadingNothing label={'JENZI AFRICA'} textColor={COLORS.white} />
+          <LoadingNothing label={'JENZI PRO'} textColor={COLORS.white} />
         </View>
 
         <View style={styles.wrapper}>

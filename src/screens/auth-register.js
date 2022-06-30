@@ -56,7 +56,7 @@ const Register = ({navigation}) => {
     }
     setLoading(true);
     axios
-      .post(`/clients`, {
+      .post(`/fundi`, {
         name,
         username,
         password,
@@ -92,7 +92,7 @@ const Register = ({navigation}) => {
               ...FONTS.h4,
               marginTop: SIZES.padding_16,
             }}>
-            JENZI SMART
+            JENZI PRO
           </Text>
         </View>
 

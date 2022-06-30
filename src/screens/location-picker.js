@@ -12,10 +12,10 @@ import {Button} from 'react-native-paper';
 //icons
 import MIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
-import {endpoints, errorMessage} from '../endpoints';
+import {axios_endpoint_error, endpoints} from '../endpoints';
 import toast from 'react-native-toast-message';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {offline_data} from '../constants';
+import {update_user_info} from '../config/utils';
+axios.defaults.baseURL = endpoints.jenzi_backend + '/jenzi/v1';
 
 const logger = console.log.bind(console, `[file: location-picker.js]`);
 
@@ -35,22 +35,13 @@ const LocationPicker = ({user_data, navigation}) => {
 
   const handleLocationUpdate = async () => {
     setLoading(true);
-    let {user} = user_data;
-    delete ['id'];
-    user = {...user, latitude: lat, longitude: lon};
+    user = {latitude: lat, longitude: lon};
     try {
-      const u = await axios.put(
-        `${endpoints.fundi_service}/accounts/${user_data.user.id}`,
-        user,
-      );
-      dispatch(user_data_actions.update_user({latitude: lat, longitude: lon}));
-      await AsyncStorage.setItem(
-        offline_data.user,
-        JSON.stringify({...user_data.user, latitude: lat, longitude: lon}),
-      );
+      const u = await axios.put(`/fundi/${user_data.user.id}`, user);
+      update_user_info(user_data.user.id);
       toast.show({type: 'success', text1: 'Location updated successfully'});
     } catch (error) {
-      errorMessage(error);
+      axios_endpoint_error(error);
     } finally {
       setLoading(false);
     }
