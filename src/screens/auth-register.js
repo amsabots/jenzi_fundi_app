@@ -15,6 +15,7 @@ import {TextInput, Button} from 'react-native-paper';
 import {endpoints, errorMessage} from '../endpoints';
 //axios
 import axios from 'axios';
+axios.defaults.baseURL = `${endpoints.jenzi_backend}/jenzi/v1`;
 
 //icon
 import {offline_data, screens} from '../constants';
@@ -25,7 +26,7 @@ const Register = ({navigation}) => {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [pass1, setPass1] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, set_username] = useState('');
   const [load, setLoading] = useState(false);
 
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ const Register = ({navigation}) => {
   }, []);
 
   const handleRegistration = () => {
-    if (!name || !password || !email)
+    if (!name || !password || !username)
       return Toast.show({
         type: 'error',
         text1: 'Please all the fields before submission',
@@ -46,7 +47,7 @@ const Register = ({navigation}) => {
         text1: 'Passwords do not match',
         position: 'bottom',
       });
-    const validate = validation_schema.validate({username: email});
+    const validate = validation_schema.validate({username: username});
     if (validate['error']) {
       return ToastAndroid.show(
         'Invalid phone number format provided',
@@ -55,9 +56,9 @@ const Register = ({navigation}) => {
     }
     setLoading(true);
     axios
-      .post(`${endpoints.fundi_service}/accounts/register`, {
+      .post(`/clients`, {
         name,
-        email,
+        username,
         password,
       })
       .then(async res => {
@@ -69,7 +70,7 @@ const Register = ({navigation}) => {
           routes: [{name: screens.main_activity}],
         });
       })
-      .catch(err => errorMessage(err))
+      .catch(err => errorMessage(axios_endpoint_error(err)))
       .finally(() => setLoading(false));
   };
 
@@ -132,7 +133,7 @@ const Register = ({navigation}) => {
             }
             placeholder="Phonenumber"
             keyboardType="number-pad"
-            onChangeText={txt => setEmail(txt)}
+            onChangeText={txt => set_username(txt)}
           />
           <TextInput
             dense={true}
