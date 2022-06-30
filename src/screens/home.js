@@ -13,7 +13,7 @@ import {chat_actions, UISettingsActions} from '../store-actions';
 //components
 import {COLORS, FONTS, SIZES} from '../constants/themes';
 
-// subscribtions
+// subscriptions
 import {screens} from '../constants';
 
 //Icons
