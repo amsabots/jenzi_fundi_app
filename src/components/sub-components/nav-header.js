@@ -24,7 +24,7 @@ const NavHeaderView = ({navigation, user_data}) => {
   };
   return (
     <View style={[styles.container]}>
-      <CircularImage size={100} />
+      <CircularImage size={100} url={user_data?.user?.photo_url} />
       <Text style={[styles.color, styles.txt1]}>
         {user_data?.user?.name || 'N/A'}
       </Text>

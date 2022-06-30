@@ -13,7 +13,7 @@ const CircularImage = ({size = 32, url}) => {
           resizeMode: 'cover',
         },
       ]}
-      source={url || require('../assets/profile.png')}
+      source={url ? {uri: url} : require('../assets/profile.png')}
     />
   );
 };
