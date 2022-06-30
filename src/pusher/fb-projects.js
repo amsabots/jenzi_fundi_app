@@ -5,6 +5,7 @@ import {store} from '../../App';
 import {chat_actions, clientActions, UISettingsActions} from '../store-actions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {offline_data, screens} from '../constants';
+import {update_user_info} from '../config/utils';
 
 const logger = console.log.bind(console, `[file: fb-projects.js]`);
 
@@ -68,6 +69,12 @@ export const subscribe_job_states = (user, navigation) => {
               `Congratulations ${user_data.user.name}, new project has been initiated`,
             ),
           );
+          // take the user offline till further notice
+          await axios.put(
+            `${endpoints.jenzi_backend}/jenzi/v1/fundi/${user.id}`,
+            {is_enabled: false},
+          );
+          update_user_info(user.id);
           await jobUtils.delete_entry(user.account_id);
           store.dispatch(chat_actions.active_chat(selected_client || {}));
           store.dispatch(clientActions.expire_request());
